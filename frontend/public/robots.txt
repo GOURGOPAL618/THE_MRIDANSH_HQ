@@ -1,0 +1,3 @@
+# Private Headquarters - No Indexing Allowed
+User-agent: *
+Disallow: /

@@ -1,0 +1,38 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-background text-white font-sans overflow-x-hidden;
+    background-color: #05070B;
+  }
+
+  /* Custom Scrollbar for Mission Control Style */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #05070B;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #0E1525;
+    border-radius: 3px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #0072FF;
+  }
+}
+
+@layer utilities {
+  .text-glow {
+    text-shadow: 0 0 10px rgba(0, 114, 255, 0.6);
+  }
+  .text-cyan-glow {
+    text-shadow: 0 0 10px rgba(0, 255, 255, 0.6);
+  }
+  .border-glow {
+    box-shadow: 0 0 10px rgba(0, 114, 255, 0.3);
+  }
+}

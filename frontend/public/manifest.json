@@ -1,0 +1,16 @@
+{
+  "short_name": "MRIDANSH HQ",
+  "name": "THE MRIDANSH Command Headquarters",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "64x64 32x32 24x24 16x16",
+      "type": "image/x-icon"
+    }
+  ],
+  "start_url": "/",
+  "theme_color": "#05070B",
+  "background_color": "#05070B",
+  "display": "standalone",
+  "orientation": "landscape"
+}
