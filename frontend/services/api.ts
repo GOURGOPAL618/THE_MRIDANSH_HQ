@@ -8,7 +8,7 @@ export interface ApiResponse<T = any> {
 
 class ApiService {
   private getBaseUrl(): string {
-    return process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+    return process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000";
   }
 
   private async request<T = any>(

@@ -1,28 +1,39 @@
 "use client";
 
 import React, { ReactNode, useState, useEffect } from "react";
-import { usePathname } from "next/navigation";
-import { motion } from "framer-motion";
+import { usePathname, useRouter } from "next/navigation";
+import Link from "next/link";
+import { motion, AnimatePresence } from "framer-motion";
 import { useTheme } from "../hooks/useTheme";
 import { useAudio } from "../hooks/useAudio";
 import { useNotification } from "../hooks/useNotification";
-import { MODULES, ModuleItem } from "../constants/modules";
+import { useAuth } from "../contexts/AuthContext";
+import { MODULES } from "../constants/modules";
 import { CommandPalette } from "../components/CommandPalette";
+import { LoadingScreen } from "../components/LoadingScreen";
 
 interface BaseLayoutProps {
   children: ReactNode;
 }
 
-export function BaseLayout({ children }: { children: ReactNode }) {
+export function BaseLayout({ children }: BaseLayoutProps) {
   const pathname = usePathname();
+  const router = useRouter();
   const { theme } = useTheme();
   const { playClick, playBeep } = useAudio();
   const { notifyInfo } = useNotification();
+  const { commander, logout, isAuthenticated, isLoading: isAuthLoading } = useAuth();
+  
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [systemTime, setSystemTime] = useState("");
+  const [isMounted, setIsMounted] = useState(false);
+  
+  const [backendStatus, setBackendStatus] = useState<"online" | "offline">("offline");
+  const [isTransitioning, setIsTransitioning] = useState(false);
 
-  // Sync System time (UTC)
+  // Sync System time (UTC) - client side only to prevent hydration mismatch
   useEffect(() => {
+    setIsMounted(true);
     const updateTime = () => {
       const d = new Date();
       const pad = (n: number) => n.toString().padStart(2, "0");
@@ -36,9 +47,53 @@ export function BaseLayout({ children }: { children: ReactNode }) {
     return () => clearInterval(interval);
   }, []);
 
+  // Live Backend Status check from API health endpoint
+  useEffect(() => {
+    const checkHealth = async () => {
+      try {
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000";
+        const response = await fetch(`${apiUrl}/health`);
+        if (response.ok) {
+          const json = await response.json();
+          if (json?.data?.status === "healthy") {
+            setBackendStatus("online");
+            return;
+          }
+        }
+        setBackendStatus("offline");
+      } catch (err) {
+        setBackendStatus("offline");
+      }
+    };
+
+    checkHealth();
+    const interval = setInterval(checkHealth, 10000); // Poll every 10s
+    return () => clearInterval(interval);
+  }, []);
+
+  // Trigger brief LoadingScreen when routing path changes to prevent blank page flashes
+  useEffect(() => {
+    setIsTransitioning(true);
+    const t = setTimeout(() => setIsTransitioning(false), 500); // snappy 500ms sync logs
+    return () => clearTimeout(t);
+  }, [pathname]);
+
+  // Route protection redirect checks
+  useEffect(() => {
+    if (!isAuthLoading && !isAuthenticated) {
+      router.push("/");
+    }
+  }, [isAuthenticated, isAuthLoading, router]);
+
   const handleSidebarToggle = () => {
     playBeep();
     setIsSidebarCollapsed((prev) => !prev);
+  };
+
+  const handleLogout = async () => {
+    playClick();
+    await logout();
+    router.push("/");
   };
 
   const getModuleTitle = () => {
@@ -113,13 +168,24 @@ export function BaseLayout({ children }: { children: ReactNode }) {
     }
   };
 
+  // Block loading state check to prevent layout flashes during authentication load
+  if (isAuthLoading || !commander) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#05070B] text-primary-glow font-mono">
+        <div className="text-center space-y-4">
+          <div className="w-10 h-10 border-2 border-primary border-t-transparent rounded-full animate-spin mx-auto"></div>
+          <p className="text-xs text-gray-500 tracking-widest uppercase animate-pulse">Checking credentials...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen flex flex-col bg-[#05070B] text-white select-none">
       
       {/* Top Navbar */}
       <header className="h-14 border-b border-primary/10 bg-[#0E1525]/80 backdrop-blur-md px-4 flex items-center justify-between z-30 font-mono text-xs">
         <div className="flex items-center space-x-3">
-          {/* Dashboard Icon */}
           <div className="w-8 h-8 rounded border border-primary/30 flex items-center justify-center bg-primary/5 text-primary shadow-glow">
             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M15.59 14.37a6 6 0 01-8.24-8.24 6 6 0 008.24 8.24z" />
@@ -137,17 +203,25 @@ export function BaseLayout({ children }: { children: ReactNode }) {
           {getModuleTitle()}
         </div>
 
-        {/* Time, Settings and Authorization Status */}
+        {/* Navbar Actions and User Details */}
         <div className="flex items-center space-x-6">
           <div className="hidden lg:block text-gray-400 font-mono text-[10px] tracking-wider bg-black/30 border border-primary/5 px-3 py-1 rounded">
-            SYSTEM TIME: <span className="text-[#00FFFF] font-bold">{systemTime}</span>
+            SYSTEM TIME: <span className="text-[#00FFFF] font-bold">{isMounted ? systemTime : "LOADING..."}</span>
           </div>
 
-          <div className="flex items-center space-x-2">
-            <span className="w-2 h-2 rounded-full bg-success animate-pulse shadow-[0_0_8px_#10B981]"></span>
-            <span className="font-bold text-success text-[10px] uppercase tracking-widest bg-success/5 border border-success/20 px-2.5 py-0.5 rounded">
-              COMMANDER AUTHENTICATED
-            </span>
+          <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-2">
+              <span className="w-2 h-2 rounded-full bg-success animate-pulse shadow-[0_0_8px_#10B981]"></span>
+              <span className="font-bold text-success text-[10px] uppercase tracking-widest">
+                {commander.username}
+              </span>
+            </div>
+            <button 
+              onClick={handleLogout}
+              className="text-[9px] text-danger border border-danger/30 hover:bg-danger/10 px-2.5 py-1 rounded transition-all duration-200 tracking-widest font-bold uppercase focus:outline-none"
+            >
+              LOGOUT
+            </button>
           </div>
         </div>
       </header>
@@ -179,17 +253,15 @@ export function BaseLayout({ children }: { children: ReactNode }) {
             </button>
           </div>
 
-          {/* Nav List */}
+          {/* Nav List - Generated directly from constants/modules.ts */}
           <nav className="flex-1 py-4 space-y-1 overflow-y-auto px-2">
             {MODULES.map((mod) => {
               const isActive = pathname === mod.path;
               return (
-                <button
+                <Link
                   key={mod.id}
-                  onClick={() => {
-                    playClick();
-                    notifyInfo(`Initiating module loading routine for: ${mod.name}`, "NAVIGATION");
-                  }}
+                  href={mod.path}
+                  onClick={() => playClick()}
                   className={`w-full flex items-center space-x-3 px-3 py-2.5 rounded text-xs font-mono border transition-all duration-200 ${
                     isActive
                       ? "bg-primary/20 text-[#00FFFF] border-primary/20 shadow-glow"
@@ -204,7 +276,7 @@ export function BaseLayout({ children }: { children: ReactNode }) {
                       {mod.name}
                     </span>
                   )}
-                </button>
+                </Link>
               );
             })}
           </nav>
@@ -217,20 +289,38 @@ export function BaseLayout({ children }: { children: ReactNode }) {
           )}
         </aside>
 
-        {/* Content Viewport */}
+        {/* Content Viewport with sync transitioning loader overlay */}
         <div className="flex-1 flex flex-col overflow-y-auto bg-[#05070B] relative p-6">
-          {children}
+          <AnimatePresence mode="wait">
+            {isTransitioning ? (
+              <motion.div
+                key="loader"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="absolute inset-0 bg-[#05070B] z-10 flex items-center justify-center p-6"
+              >
+                <LoadingScreen 
+                  title={`Synchronizing ${getModuleTitle()}`} 
+                  durationMs={400}
+                />
+              </motion.div>
+            ) : null}
+          </AnimatePresence>
+          <div className={isTransitioning ? "opacity-0" : "opacity-100 transition-opacity duration-300 flex-1 flex flex-col"}>
+            {children}
+          </div>
         </div>
       </div>
 
-      {/* Footer Status Bar */}
+      {/* Footer Status Bar with Live GET /health polling status checks */}
       <footer className="h-8 border-t border-primary/10 bg-[#0E1525] px-4 flex items-center justify-between z-30 font-mono text-[9px] text-gray-500 select-none">
         <div className="flex items-center space-x-6">
           <span className="tracking-widest uppercase">COCKPIT STATUS: ONLINE</span>
           
           <div className="flex items-center space-x-2">
-            <span className="w-1.5 h-1.5 rounded-full bg-success"></span>
-            <span>API: CONNECTED</span>
+            <span className={`w-1.5 h-1.5 rounded-full ${backendStatus === "online" ? "bg-success" : "bg-danger"}`}></span>
+            <span>API backend: {backendStatus === "online" ? "🟢 Online" : "🔴 Offline"}</span>
           </div>
 
           <div className="flex items-center space-x-2">

@@ -1,10 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import BaseLayout from "../layouts/BaseLayout";
-import Panel from "../components/Panel";
-import Button from "../components/Button";
-import StatusBadge from "../components/StatusBadge";
+import { useRouter } from "next/navigation";
 import { useNotification } from "../hooks/useNotification";
 import { useAuth } from "../contexts/AuthContext";
 
@@ -21,6 +18,7 @@ const logsSequence = [
 ];
 
 export default function MissionInitializationPage() {
+  const router = useRouter();
   const [bootProgress, setBootProgress] = useState(0);
   const [bootLogs, setBootLogs] = useState<string[]>([]);
   const [isReady, setIsReady] = useState(false);
@@ -28,8 +26,15 @@ export default function MissionInitializationPage() {
   const [password, setPassword] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   
-  const { login, logout, isAuthenticated, commander, isLoading } = useAuth();
-  const { notifySuccess, notifyError } = useNotification();
+  const { login, isAuthenticated, isLoading } = useAuth();
+  const { notifyError } = useNotification();
+
+  // Redirect to dashboard immediately if already authenticated
+  useEffect(() => {
+    if (!isLoading && isAuthenticated) {
+      router.push("/dashboard");
+    }
+  }, [isAuthenticated, isLoading, router]);
 
   useEffect(() => {
     let currentLogIndex = 0;
@@ -43,7 +48,7 @@ export default function MissionInitializationPage() {
         setBootProgress(100);
         setIsReady(true);
       }
-    }, 300); // Speed up slightly for premium snappy feel
+    }, 200); // Fast cyber-bootstrap loading speed
 
     return () => clearInterval(logInterval);
   }, []);
@@ -54,13 +59,15 @@ export default function MissionInitializationPage() {
     setIsSubmitting(true);
     const success = await login(password);
     setIsSubmitting(false);
-    if (!success) {
+    if (success) {
+      router.push("/dashboard");
+    } else {
       setPassword("");
     }
   };
 
   // If AuthContext is checking credentials on load, show system loader
-  if (isLoading) {
+  if (isLoading || isAuthenticated) {
     return (
       <main className="min-h-screen flex items-center justify-center bg-[#05070B] font-mono">
         <div className="text-center space-y-4">
@@ -68,103 +75,6 @@ export default function MissionInitializationPage() {
           <p className="text-xs text-gray-500 tracking-widest animate-pulse">SYNCHRONIZING SECURE TELEMETRY FEED...</p>
         </div>
       </main>
-    );
-  }
-
-  // If Commander has authorized access, transition into the Base Cockpit Layout
-  if (isAuthenticated && commander) {
-    return (
-      <BaseLayout>
-        <div className="space-y-6">
-          <Panel 
-            title="Jagannath Command Center (JCC) Console" 
-            subtitle="Central Cockpit Operations Center"
-            statusIndicator="healthy"
-          >
-            <div className="space-y-6 font-mono">
-              <div className="border-l-2 border-[#0072FF] pl-4 py-1 text-xs text-gray-300 flex justify-between items-center">
-                <div>
-                  Welcome back, <span className="text-[#00FFFF] font-bold">{commander.username}</span>. The cockpit environment is fully operational.
-                  Select modules in the sidebar for telemetry control.
-                </div>
-                <Button variant="secondary" onClick={() => logout()}>
-                  TERMINATE SESSION
-                </Button>
-              </div>
-
-              {/* Grid of system diagnostics cards */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <Panel variant="secondary" title="REACTOR STATUS" statusIndicator="healthy">
-                  <div className="space-y-2 text-[10px] text-gray-400">
-                    <div className="flex justify-between">
-                      <span>CORE ENGINE</span>
-                      <span className="text-success font-bold">NOMINAL</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>TEMPERATURE</span>
-                      <span className="text-[#00FFFF]">298K (24.8°C)</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>THRUST VECTOR</span>
-                      <span className="text-success">0% (IDLE)</span>
-                    </div>
-                  </div>
-                </Panel>
-
-                <Panel variant="secondary" title="RADAR SCANNER" statusIndicator="warning">
-                  <div className="space-y-2 text-[10px] text-gray-400">
-                    <div className="flex justify-between">
-                      <span>SWEEP MODE</span>
-                      <span className="text-[#00FFFF] font-bold">STANDBY</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>RADAR GRID</span>
-                      <span className="text-success">SYNCD (100%)</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>TARGET COUNT</span>
-                      <span>0 DETECTED</span>
-                    </div>
-                  </div>
-                </Panel>
-
-                <Panel variant="secondary" title="SECURE ACCESS" statusIndicator="healthy">
-                  <div className="space-y-2 text-[10px] text-gray-400">
-                    <div className="flex justify-between">
-                      <span>CLEARANCE LEVEL</span>
-                      <span className="text-success font-bold">{commander.role.toUpperCase()}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>DECRYPTION ENGINE</span>
-                      <span className="text-success">ACTIVE</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>LOCKDOWN MODE</span>
-                      <span className="text-warning">ARMED</span>
-                    </div>
-                  </div>
-                </Panel>
-              </div>
-
-              {/* Footer status summary alerts */}
-              <div className="flex flex-wrap gap-3 pt-4 border-t border-primary/10 items-center justify-between">
-                <div className="flex flex-wrap gap-2">
-                  <StatusBadge status="healthy" label="SYSTEMS ONLINE" />
-                  <StatusBadge status="standby" label="TELEMETRY FEED STANDBY" />
-                  <StatusBadge status="offline" label="STAGING LINK INACTIVE" />
-                </div>
-                
-                <Button 
-                  variant="glow"
-                  onClick={() => alert("Cockpit action initiated: Querying active aerospace coordinates.")}
-                >
-                  Query Coordinates
-                </Button>
-              </div>
-            </div>
-          </Panel>
-        </div>
-      </BaseLayout>
     );
   }
 
