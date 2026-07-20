@@ -29,6 +29,7 @@ export const viewport: Viewport = {
 
 import { ThemeProvider } from "../contexts/ThemeContext";
 import { NotificationProvider } from "../contexts/NotificationContext";
+import { AuthProvider } from "../contexts/AuthContext";
 
 export default function RootLayout({
   children,
@@ -40,7 +41,9 @@ export default function RootLayout({
       <body className="antialiased bg-background text-white min-h-screen">
         <ThemeProvider>
           <NotificationProvider>
-            {children}
+            <AuthProvider>
+              {children}
+            </AuthProvider>
           </NotificationProvider>
         </ThemeProvider>
       </body>

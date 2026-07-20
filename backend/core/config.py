@@ -1,6 +1,6 @@
 import os
 from typing import List, Optional
-from pydantic import AnyHttpUrl
+from pydantic import AnyHttpUrl, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
@@ -11,6 +11,8 @@ class Settings(BaseSettings):
     SESSION_SECRET: str = "bootstrap_placeholder_session_secret_change_me_in_production"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 7  # 1 week
     ALGORITHM: str = "HS256"
+    COMMANDER_USERNAME: str = "commander"
+    COMMANDER_PASSWORD: str = "default_mridansh_password_change_me"
 
     # Database
     DATABASE_URL: str = "postgresql://postgres:postgres@localhost:5432/mridansh_hq"
@@ -36,5 +38,14 @@ class Settings(BaseSettings):
         env_file_encoding="utf-8",
         extra="ignore"
     )
+
+    @model_validator(mode="after")
+    def resolve_sqlite_path(self) -> "Settings":
+        if self.DATABASE_URL.startswith("sqlite:///./"):
+            import os
+            backend_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+            db_file = self.DATABASE_URL.replace("sqlite:///./", "")
+            self.DATABASE_URL = f"sqlite:///{os.path.join(backend_dir, db_file)}"
+        return self
 
 settings = Settings()

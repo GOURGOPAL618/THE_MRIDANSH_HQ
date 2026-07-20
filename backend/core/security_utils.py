@@ -26,9 +26,9 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
     except Exception:
         return False
 
-def create_access_token(subject: Any, expires_delta: Optional[timedelta] = None) -> str:
+def create_access_token(subject: Any, sid: str, expires_delta: Optional[timedelta] = None) -> str:
     """
-    Create a JWT access token for authentication
+    Create a JWT access token for authentication containing subject (sub) and session ID (sid)
     """
     if expires_delta:
         expire = datetime.now(UTC) + expires_delta
@@ -38,6 +38,7 @@ def create_access_token(subject: Any, expires_delta: Optional[timedelta] = None)
     to_encode = {
         "exp": expire,
         "sub": str(subject),
+        "sid": str(sid),
         "iat": datetime.now(UTC)
     }
     

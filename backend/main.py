@@ -39,6 +39,49 @@ app.include_router(api_router, prefix=settings.API_V1_STR)
 @app.on_event("startup")
 async def startup_event():
     system_logger.info("Initializing THE MRIDANSH Headquarters JCC backend system...")
+    
+    # Auto-seed the Single Commander record if missing
+    from backend.database.session import SessionLocal
+    from backend.repositories.repos import commander_repo
+    from backend.core.security_utils import get_password_hash
+    from backend.models.models import Commander, Settings as SettingsModel
+    
+    db = SessionLocal()
+    try:
+        commander = commander_repo.get_by_username(db, settings.COMMANDER_USERNAME)
+        if not commander:
+            system_logger.info(f"Seeding single Commander '{settings.COMMANDER_USERNAME}' into database...")
+            
+            # Hash password only once
+            hashed_pw = get_password_hash(settings.COMMANDER_PASSWORD)
+            
+            # Create Commander record directly
+            new_commander = Commander(
+                username=settings.COMMANDER_USERNAME,
+                email="commander@mridansh.hq",
+                hashed_password=hashed_pw,
+                role="commander"
+            )
+            db.add(new_commander)
+            db.commit()
+            db.refresh(new_commander)
+            
+            # Also seed default settings for this Commander
+            default_settings = SettingsModel(
+                commander_id=new_commander.id,
+                theme="default",
+                volume=0.5,
+                is_muted=False,
+                notifications_enabled=True,
+                performance_mode="quality"
+            )
+            db.add(default_settings)
+            db.commit()
+            system_logger.info(f"Successfully seeded Commander '{settings.COMMANDER_USERNAME}' and default cockpit configurations.")
+    except Exception as e:
+        system_logger.error(f"Failed to seed Commander record on startup: {str(e)}", exc_info=True)
+    finally:
+        db.close()
 
 @app.on_event("shutdown")
 async def shutdown_event():

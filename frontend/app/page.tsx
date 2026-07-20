@@ -6,6 +6,7 @@ import Panel from "../components/Panel";
 import Button from "../components/Button";
 import StatusBadge from "../components/StatusBadge";
 import { useNotification } from "../hooks/useNotification";
+import { useAuth } from "../contexts/AuthContext";
 
 const logsSequence = [
   "Establishing secure quantum uplink...",
@@ -23,8 +24,12 @@ export default function MissionInitializationPage() {
   const [bootProgress, setBootProgress] = useState(0);
   const [bootLogs, setBootLogs] = useState<string[]>([]);
   const [isReady, setIsReady] = useState(false);
-  const [isAuthorized, setIsAuthorized] = useState(false);
-  const { notifySuccess } = useNotification();
+  
+  const [password, setPassword] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  
+  const { login, logout, isAuthenticated, commander, isLoading } = useAuth();
+  const { notifySuccess, notifyError } = useNotification();
 
   useEffect(() => {
     let currentLogIndex = 0;
@@ -38,18 +43,36 @@ export default function MissionInitializationPage() {
         setBootProgress(100);
         setIsReady(true);
       }
-    }, 450);
+    }, 300); // Speed up slightly for premium snappy feel
 
     return () => clearInterval(logInterval);
   }, []);
 
-  const handleAccessCommand = () => {
-    notifySuccess("Commander Gourgopal Mohapatra authorization validated. Secure routing unlocked.", "ACCESS APPROVED");
-    setIsAuthorized(true);
+  const handleAccessCommand = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!password) return;
+    setIsSubmitting(true);
+    const success = await login(password);
+    setIsSubmitting(false);
+    if (!success) {
+      setPassword("");
+    }
   };
 
+  // If AuthContext is checking credentials on load, show system loader
+  if (isLoading) {
+    return (
+      <main className="min-h-screen flex items-center justify-center bg-[#05070B] font-mono">
+        <div className="text-center space-y-4">
+          <div className="w-12 h-12 border-2 border-primary border-t-transparent rounded-full animate-spin mx-auto"></div>
+          <p className="text-xs text-gray-500 tracking-widest animate-pulse">SYNCHRONIZING SECURE TELEMETRY FEED...</p>
+        </div>
+      </main>
+    );
+  }
+
   // If Commander has authorized access, transition into the Base Cockpit Layout
-  if (isAuthorized) {
+  if (isAuthenticated && commander) {
     return (
       <BaseLayout>
         <div className="space-y-6">
@@ -59,9 +82,14 @@ export default function MissionInitializationPage() {
             statusIndicator="healthy"
           >
             <div className="space-y-6 font-mono">
-              <div className="border-l-2 border-[#0072FF] pl-4 py-1 text-xs text-gray-300">
-                Welcome back, <span className="text-[#00FFFF] font-bold">Commander Gourgopal Mohapatra</span>. The cockpit environment is fully operational.
-                Below is the status of the primary aerospace subsystems. Select modules in the sidebar for telemetry control.
+              <div className="border-l-2 border-[#0072FF] pl-4 py-1 text-xs text-gray-300 flex justify-between items-center">
+                <div>
+                  Welcome back, <span className="text-[#00FFFF] font-bold">{commander.username}</span>. The cockpit environment is fully operational.
+                  Select modules in the sidebar for telemetry control.
+                </div>
+                <Button variant="secondary" onClick={() => logout()}>
+                  TERMINATE SESSION
+                </Button>
               </div>
 
               {/* Grid of system diagnostics cards */}
@@ -104,7 +132,7 @@ export default function MissionInitializationPage() {
                   <div className="space-y-2 text-[10px] text-gray-400">
                     <div className="flex justify-between">
                       <span>CLEARANCE LEVEL</span>
-                      <span className="text-success font-bold">COMMANDER</span>
+                      <span className="text-success font-bold">{commander.role.toUpperCase()}</span>
                     </div>
                     <div className="flex justify-between">
                       <span>DECRYPTION ENGINE</span>
@@ -203,16 +231,35 @@ export default function MissionInitializationPage() {
         </div>
 
         {/* Actions Grid */}
-        <div className="mt-8 flex justify-center border-t border-[#0E1525]/50 pt-6">
+        <div className="mt-8 border-t border-[#0E1525]/50 pt-6">
           {isReady ? (
-            <button 
-              className="px-8 py-3 bg-[#0072FF]/20 border border-primary text-[#00FFFF] hover:bg-[#0072FF]/40 font-bold rounded tracking-widest shadow-cyan-glow transition-all duration-300 animate-bounce"
-              onClick={handleAccessCommand}
-            >
-              ACCESS COMMAND CENTER
-            </button>
+            <form onSubmit={handleAccessCommand} className="space-y-4 max-w-sm mx-auto">
+              <div className="space-y-2">
+                <label className="block text-xs font-bold text-gray-400 text-center tracking-widest">
+                  ENTER COCKPIT SECURITY KEY
+                </label>
+                <input 
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  disabled={isSubmitting}
+                  placeholder="••••••••••••••"
+                  className="w-full text-center px-4 py-2.5 bg-black/60 border border-primary/30 rounded font-mono text-[#00FFFF] placeholder-primary/20 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/50 transition-all duration-300 disabled:opacity-50"
+                  required
+                />
+              </div>
+              <div className="flex justify-center pt-2">
+                <button 
+                  type="submit"
+                  disabled={isSubmitting || !password}
+                  className="px-8 py-3 bg-[#0072FF]/20 border border-primary text-[#00FFFF] hover:bg-[#0072FF]/40 font-bold rounded tracking-widest shadow-cyan-glow transition-all duration-300 disabled:opacity-30 disabled:pointer-events-none"
+                >
+                  {isSubmitting ? "AUTHORIZING..." : "ACCESS COMMAND CENTER"}
+                </button>
+              </div>
+            </form>
           ) : (
-            <div className="text-xs text-gray-500 animate-pulse tracking-widest">
+            <div className="text-center text-xs text-gray-500 animate-pulse tracking-widest">
               SYSTEM STANDBY - AUTHENTICATING COMMANDER UPLINK...
             </div>
           )}

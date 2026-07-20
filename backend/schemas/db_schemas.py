@@ -15,6 +15,10 @@ class CommanderUpdate(BaseModel):
     email: Optional[EmailStr] = None
     password: Optional[str] = Field(None, min_length=8, max_length=100)
 
+class CommanderLogin(BaseModel):
+    username: str
+    password: str
+
 class CommanderOut(CommanderBase):
     id: uuid.UUID
     role: str
