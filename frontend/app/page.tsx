@@ -1,6 +1,11 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import BaseLayout from "../layouts/BaseLayout";
+import Panel from "../components/Panel";
+import Button from "../components/Button";
+import StatusBadge from "../components/StatusBadge";
+import { useNotification } from "../hooks/useNotification";
 
 const logsSequence = [
   "Establishing secure quantum uplink...",
@@ -18,6 +23,8 @@ export default function MissionInitializationPage() {
   const [bootProgress, setBootProgress] = useState(0);
   const [bootLogs, setBootLogs] = useState<string[]>([]);
   const [isReady, setIsReady] = useState(false);
+  const [isAuthorized, setIsAuthorized] = useState(false);
+  const { notifySuccess } = useNotification();
 
   useEffect(() => {
     let currentLogIndex = 0;
@@ -36,6 +43,103 @@ export default function MissionInitializationPage() {
     return () => clearInterval(logInterval);
   }, []);
 
+  const handleAccessCommand = () => {
+    notifySuccess("Commander Gourgopal Mohapatra authorization validated. Secure routing unlocked.", "ACCESS APPROVED");
+    setIsAuthorized(true);
+  };
+
+  // If Commander has authorized access, transition into the Base Cockpit Layout
+  if (isAuthorized) {
+    return (
+      <BaseLayout>
+        <div className="space-y-6">
+          <Panel 
+            title="Jagannath Command Center (JCC) Console" 
+            subtitle="Central Cockpit Operations Center"
+            statusIndicator="healthy"
+          >
+            <div className="space-y-6 font-mono">
+              <div className="border-l-2 border-[#0072FF] pl-4 py-1 text-xs text-gray-300">
+                Welcome back, <span className="text-[#00FFFF] font-bold">Commander Gourgopal Mohapatra</span>. The cockpit environment is fully operational.
+                Below is the status of the primary aerospace subsystems. Select modules in the sidebar for telemetry control.
+              </div>
+
+              {/* Grid of system diagnostics cards */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <Panel variant="secondary" title="REACTOR STATUS" statusIndicator="healthy">
+                  <div className="space-y-2 text-[10px] text-gray-400">
+                    <div className="flex justify-between">
+                      <span>CORE ENGINE</span>
+                      <span className="text-success font-bold">NOMINAL</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>TEMPERATURE</span>
+                      <span className="text-[#00FFFF]">298K (24.8°C)</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>THRUST VECTOR</span>
+                      <span className="text-success">0% (IDLE)</span>
+                    </div>
+                  </div>
+                </Panel>
+
+                <Panel variant="secondary" title="RADAR SCANNER" statusIndicator="warning">
+                  <div className="space-y-2 text-[10px] text-gray-400">
+                    <div className="flex justify-between">
+                      <span>SWEEP MODE</span>
+                      <span className="text-[#00FFFF] font-bold">STANDBY</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>RADAR GRID</span>
+                      <span className="text-success">SYNCD (100%)</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>TARGET COUNT</span>
+                      <span>0 DETECTED</span>
+                    </div>
+                  </div>
+                </Panel>
+
+                <Panel variant="secondary" title="SECURE ACCESS" statusIndicator="healthy">
+                  <div className="space-y-2 text-[10px] text-gray-400">
+                    <div className="flex justify-between">
+                      <span>CLEARANCE LEVEL</span>
+                      <span className="text-success font-bold">COMMANDER</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>DECRYPTION ENGINE</span>
+                      <span className="text-success">ACTIVE</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>LOCKDOWN MODE</span>
+                      <span className="text-warning">ARMED</span>
+                    </div>
+                  </div>
+                </Panel>
+              </div>
+
+              {/* Footer status summary alerts */}
+              <div className="flex flex-wrap gap-3 pt-4 border-t border-primary/10 items-center justify-between">
+                <div className="flex flex-wrap gap-2">
+                  <StatusBadge status="healthy" label="SYSTEMS ONLINE" />
+                  <StatusBadge status="standby" label="TELEMETRY FEED STANDBY" />
+                  <StatusBadge status="offline" label="STAGING LINK INACTIVE" />
+                </div>
+                
+                <Button 
+                  variant="glow"
+                  onClick={() => alert("Cockpit action initiated: Querying active aerospace coordinates.")}
+                >
+                  Query Coordinates
+                </Button>
+              </div>
+            </div>
+          </Panel>
+        </div>
+      </BaseLayout>
+    );
+  }
+
   return (
     <main className="min-h-screen flex items-center justify-center bg-[#05070B] p-4 relative overflow-hidden font-mono selection:bg-[#0072FF] selection:text-white">
       {/* Background Cyber Grid */}
@@ -45,7 +149,7 @@ export default function MissionInitializationPage() {
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-[#0072FF]/10 rounded-full blur-[120px] pointer-events-none"></div>
 
       {/* Main Initialization Container */}
-      <div className="w-full max-w-2xl bg-[#0E1525]/90 border border-panel backdrop-blur-md rounded-lg p-6 shadow-glow relative z-10">
+      <div className="w-full max-w-2xl bg-[#0E1525]/90 border border-primary/20 backdrop-blur-md rounded-lg p-6 shadow-glow relative z-10">
         
         {/* Terminal Header */}
         <div className="flex items-center justify-between border-b border-[#0E1525]/50 pb-4 mb-6">
@@ -103,7 +207,7 @@ export default function MissionInitializationPage() {
           {isReady ? (
             <button 
               className="px-8 py-3 bg-[#0072FF]/20 border border-primary text-[#00FFFF] hover:bg-[#0072FF]/40 font-bold rounded tracking-widest shadow-cyan-glow transition-all duration-300 animate-bounce"
-              onClick={() => alert("Authorization verified. Command module initialized. Cockpit routing will be unlocked in Task 01.")}
+              onClick={handleAccessCommand}
             >
               ACCESS COMMAND CENTER
             </button>
