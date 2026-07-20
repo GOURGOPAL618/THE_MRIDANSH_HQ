@@ -10,6 +10,11 @@ yarn-debug.log*
 yarn-error.log*
 .eslintcache
 
+# Environment files
+.env
+.env.*
+!.env.example
+
 # Python (Backend)
 __pycache__/
 *.py[cod]

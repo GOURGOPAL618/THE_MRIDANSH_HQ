@@ -1,7 +1,12 @@
-# Import Base and SQLAlchemy models here for Alembic target_metadata discovery
-from database.session import Base
-
-# Example import to ensure future tables register properly with Alembic:
-# from models.commander import Commander
-# from models.session import Session
-# from models.log import ActivityLog
+from backend.database.session import Base
+from backend.models.models import (
+    Commander,
+    CommanderSession,
+    Settings,
+    ActivityLog,
+    SecurityEvent,
+    EngineLog,
+    Research,
+    Dataset,
+    Experiment
+)

@@ -7,13 +7,13 @@ class Settings(BaseSettings):
     # Core Security
     PROJECT_NAME: str = "THE MRIDANSH Headquarters"
     API_V1_STR: str = "/api/v1"
-    JWT_SECRET: str
-    SESSION_SECRET: str
+    JWT_SECRET: str = "bootstrap_placeholder_secret_key_change_me_in_production"
+    SESSION_SECRET: str = "bootstrap_placeholder_session_secret_change_me_in_production"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 7  # 1 week
     ALGORITHM: str = "HS256"
 
     # Database
-    DATABASE_URL: str
+    DATABASE_URL: str = "postgresql://postgres:postgres@localhost:5432/mridansh_hq"
 
     # CORS Origins (to support localhost, Vercel, and future custom domains)
     BACKEND_CORS_ORIGINS: List[str] = [
@@ -37,9 +37,4 @@ class Settings(BaseSettings):
         extra="ignore"
     )
 
-settings = Settings(
-    # Fallback to load placeholder secrets if env is missing during bootstrap build checks
-    JWT_SECRET=os.getenv("JWT_SECRET", "bootstrap_placeholder_secret_key_change_me_in_production"),
-    SESSION_SECRET=os.getenv("SESSION_SECRET", "bootstrap_placeholder_session_secret_change_me_in_production"),
-    DATABASE_URL=os.getenv("DATABASE_URL", "postgresql://postgres:postgres@localhost:5432/mridansh_hq"),
-)
+settings = Settings()

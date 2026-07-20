@@ -1,14 +1,18 @@
 from typing import Generator
 from sqlalchemy import create_engine
 from sqlalchemy.orm import declarative_base, sessionmaker
-from core.config import settings
+from backend.core.config import settings
 
 # Create database engine
-# For Neon/Serverless DBs, configure pooling and keep-alives
+connect_args = {}
+if settings.DATABASE_URL.startswith("sqlite"):
+    connect_args = {"check_same_thread": False}
+
 engine = create_engine(
     settings.DATABASE_URL,
     pool_pre_ping=True,
     pool_recycle=3600,
+    connect_args=connect_args,
 )
 
 # Sessionmaker factory
