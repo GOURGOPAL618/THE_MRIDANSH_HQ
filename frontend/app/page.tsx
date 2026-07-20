@@ -2,7 +2,6 @@
 
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { useNotification } from "../hooks/useNotification";
 import { useAuth } from "../contexts/AuthContext";
 
 const logsSequence = [
@@ -27,7 +26,6 @@ export default function MissionInitializationPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   
   const { login, isAuthenticated, isLoading } = useAuth();
-  const { notifyError } = useNotification();
 
   // Redirect to dashboard immediately if already authenticated
   useEffect(() => {

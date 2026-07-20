@@ -19,7 +19,11 @@ app = FastAPI(
     redoc_url=f"{settings.API_V1_STR}/redoc",
 )
 
-# CORS configuration to support localhost, Vercel, and custom domains
+# Register request lifecycle middlewares
+app.add_middleware(TelemetryMiddleware)
+app.add_middleware(RequestIDMiddleware)
+
+# CORS configuration to support localhost, Vercel, and custom domains (registered last to execute first in ASGI pipeline)
 if settings.BACKEND_CORS_ORIGINS:
     app.add_middleware(
         CORSMiddleware,
@@ -28,10 +32,6 @@ if settings.BACKEND_CORS_ORIGINS:
         allow_methods=["*"],
         allow_headers=["*"],
     )
-
-# Register request lifecycle middlewares
-app.add_middleware(TelemetryMiddleware)
-app.add_middleware(RequestIDMiddleware)
 
 # Mount versioned API routers
 app.include_router(api_router, prefix=settings.API_V1_STR)

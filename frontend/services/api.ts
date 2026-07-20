@@ -8,7 +8,7 @@ export interface ApiResponse<T = any> {
 
 class ApiService {
   private getBaseUrl(): string {
-    return process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000";
+    return process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
   }
 
   private async request<T = any>(
@@ -49,6 +49,12 @@ class ApiService {
 
       return { data, statusCode };
     } catch (err: any) {
+      if (err.name === "AbortError" || options.signal?.aborted) {
+        return {
+          error: "Request aborted",
+          statusCode: 499,
+        };
+      }
       console.error(`API service request to "${url}" failed:`, err);
       return {
         error: err.message || "Network connection failure",
@@ -57,30 +63,50 @@ class ApiService {
     }
   }
 
-  public async get<T = any>(path: string, headers?: Record<string, string>): Promise<ApiResponse<T>> {
-    return this.request<T>(path, { method: "GET", headers });
+  public async get<T = any>(
+    path: string, 
+    headers?: Record<string, string>, 
+    options: RequestInit = {}
+  ): Promise<ApiResponse<T>> {
+    return this.request<T>(path, { ...options, method: "GET", headers });
   }
 
-  public async post<T = any>(path: string, body?: any, headers?: Record<string, string>): Promise<ApiResponse<T>> {
+  public async post<T = any>(
+    path: string, 
+    body?: any, 
+    headers?: Record<string, string>, 
+    options: RequestInit = {}
+  ): Promise<ApiResponse<T>> {
     const isFormData = body instanceof FormData;
     return this.request<T>(path, {
+      ...options,
       method: "POST",
       body: isFormData ? body : JSON.stringify(body),
       headers,
     });
   }
 
-  public async put<T = any>(path: string, body?: any, headers?: Record<string, string>): Promise<ApiResponse<T>> {
+  public async put<T = any>(
+    path: string, 
+    body?: any, 
+    headers?: Record<string, string>, 
+    options: RequestInit = {}
+  ): Promise<ApiResponse<T>> {
     const isFormData = body instanceof FormData;
     return this.request<T>(path, {
+      ...options,
       method: "PUT",
       body: isFormData ? body : JSON.stringify(body),
       headers,
     });
   }
 
-  public async delete<T = any>(path: string, headers?: Record<string, string>): Promise<ApiResponse<T>> {
-    return this.request<T>(path, { method: "DELETE", headers });
+  public async delete<T = any>(
+    path: string, 
+    headers?: Record<string, string>, 
+    options: RequestInit = {}
+  ): Promise<ApiResponse<T>> {
+    return this.request<T>(path, { ...options, method: "DELETE", headers });
   }
 }
 
