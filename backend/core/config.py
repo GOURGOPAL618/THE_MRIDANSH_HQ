@@ -6,10 +6,11 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 class Settings(BaseSettings):
     # Core Security
     PROJECT_NAME: str = "THE MRIDANSH Headquarters"
-    API_V1_STR: str = "/api"
+    API_V1_STR: str = "/api/v1"
     JWT_SECRET: str
     SESSION_SECRET: str
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 7  # 1 week
+    ALGORITHM: str = "HS256"
 
     # Database
     DATABASE_URL: str
