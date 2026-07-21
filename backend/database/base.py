@@ -8,5 +8,6 @@ from backend.models.models import (
     EngineLog,
     Research,
     Dataset,
-    Experiment
+    Experiment,
+    EarthBookmark
 )

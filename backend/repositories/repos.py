@@ -11,7 +11,8 @@ from backend.models.models import (
     EngineLog,
     Research,
     Dataset,
-    Experiment
+    Experiment,
+    EarthBookmark
 )
 from backend.schemas.db_schemas import (
     CommanderCreate, CommanderUpdate,
@@ -78,6 +79,17 @@ class ExperimentRepository(BaseRepository[Experiment, ExperimentCreate, Experime
         return db.query(self.model).filter(self.model.status == status).all()
 
 
+class EarthBookmarkRepository(BaseRepository[EarthBookmark, Any := Any, Any := Any]):
+    def get_by_commander(self, db: Session, commander_id: uuid.UUID) -> List[EarthBookmark]:
+        return db.query(self.model).filter(self.model.commander_id == commander_id).order_by(self.model.created_at.desc()).all()
+
+    def get_by_commander_and_id(self, db: Session, commander_id: uuid.UUID, bookmark_id: uuid.UUID) -> Optional[EarthBookmark]:
+        return db.query(self.model).filter(
+            self.model.commander_id == commander_id,
+            self.model.id == bookmark_id
+        ).first()
+
+
 # Instantiate repositories for global import
 commander_repo = CommanderRepository(Commander)
 session_repo = SessionRepository(CommanderSession)
@@ -88,3 +100,4 @@ engine_log_repo = EngineLogRepository(EngineLog)
 research_repo = ResearchRepository(Research)
 dataset_repo = DatasetRepository(Dataset)
 experiment_repo = ExperimentRepository(Experiment)
+bookmark_repo = EarthBookmarkRepository(EarthBookmark)

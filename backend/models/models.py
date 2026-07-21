@@ -19,6 +19,7 @@ class Commander(Base):
     # Relationships
     sessions: Mapped[List["CommanderSession"]] = relationship("CommanderSession", back_populates="commander", cascade="all, delete-orphan")
     settings: Mapped["Settings"] = relationship("Settings", back_populates="commander", uselist=False, cascade="all, delete-orphan")
+    bookmarks: Mapped[List["EarthBookmark"]] = relationship("EarthBookmark", back_populates="commander", cascade="all, delete-orphan")
 
 
 class CommanderSession(Base):
@@ -120,3 +121,18 @@ class Experiment(Base):
     notes: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False)
+
+
+class EarthBookmark(Base):
+    __tablename__ = "earth_bookmarks"
+
+    id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True, default=uuid.uuid4)
+    commander_id: Mapped[uuid.UUID] = mapped_column(Uuid, ForeignKey("commanders.id", ondelete="CASCADE"), index=True, nullable=False)
+    name: Mapped[str] = mapped_column(String(255), nullable=False)
+    latitude: Mapped[float] = mapped_column(Float, nullable=False)
+    longitude: Mapped[float] = mapped_column(Float, nullable=False)
+    altitude: Mapped[float] = mapped_column(Float, nullable=False, default=100000.0)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)
+
+    # Relationships
+    commander: Mapped["Commander"] = relationship("Commander", back_populates="bookmarks")
