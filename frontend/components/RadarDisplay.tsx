@@ -37,6 +37,10 @@ export default function RadarDisplay({
   const selectedTargetIdRef = useRef<string | null>(selectedTargetId);
   const onSelectTargetRef = useRef(onSelectTarget);
 
+  // Radar image assets references
+  const radarImageRef = useRef<HTMLImageElement | null>(null);
+  const gridImageRef = useRef<HTMLImageElement | null>(null);
+
   // Intensity trackers to animate target sweeps fading out
   const targetIntensities = useRef<{ [key: string]: number }>({});
 
@@ -52,6 +56,20 @@ export default function RadarDisplay({
   useEffect(() => {
     onSelectTargetRef.current = onSelectTarget;
   }, [onSelectTarget]);
+
+  // Load image assets on mount
+  useEffect(() => {
+    const rImg = new Image();
+    rImg.src = "/radar/radar.png";
+    rImg.onload = () => {
+      radarImageRef.current = rImg;
+    };
+    const gImg = new Image();
+    gImg.src = "/radar/radar-grid.png";
+    gImg.onload = () => {
+      gridImageRef.current = gImg;
+    };
+  }, []);
 
   // Click handler to select targets
   const handleCanvasClick = (e: React.MouseEvent<HTMLCanvasElement>) => {
@@ -129,7 +147,14 @@ export default function RadarDisplay({
       ctx.fillStyle = "#05070B";
       ctx.fillRect(0, 0, size, size);
 
-      // 2. Draw radar grids (concentric circles)
+      // Draw static grid asset if loaded
+      if (gridImageRef.current) {
+        ctx.globalAlpha = 0.15;
+        ctx.drawImage(gridImageRef.current, centerX - maxRadius, centerY - maxRadius, maxRadius * 2, maxRadius * 2);
+        ctx.globalAlpha = 1.0;
+      }
+
+      // Draw concentric rings lines on top for visual precision
       ctx.strokeStyle = "rgba(0, 255, 255, 0.08)";
       ctx.lineWidth = 1;
       const rings = 4;
@@ -176,6 +201,16 @@ export default function RadarDisplay({
         ctx.arc(centerX, centerY, maxRadius, startRad, endRad);
         ctx.closePath();
         ctx.fill();
+      }
+
+      // Draw rotating radar overlay if loaded
+      if (radarImageRef.current) {
+        ctx.save();
+        ctx.translate(centerX, centerY);
+        ctx.rotate(currentRad + Math.PI / 2); // Sync rotation angle
+        ctx.globalAlpha = 0.3; // Glow opacity
+        ctx.drawImage(radarImageRef.current, -maxRadius, -maxRadius, maxRadius * 2, maxRadius * 2);
+        ctx.restore();
       }
 
       // Draw primary sweep line beam

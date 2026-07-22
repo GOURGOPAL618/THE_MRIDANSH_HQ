@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import BaseLayout from "../../layouts/BaseLayout";
 import Panel from "../../components/Panel";
 import RadarDisplay, { RadarTarget } from "../../components/RadarDisplay";
@@ -10,6 +10,187 @@ interface ApiResponseEnvelope<T> {
   success: boolean;
   message: string;
   data: T;
+}
+
+// 1. Orbital Elevation Profile Mini-Radar Component (Z-Axis mapping)
+function OrbitalElevationScan({ targets, selectedTargetId }: { targets: RadarTarget[]; selectedTargetId: string | null }) {
+  const width = 280;
+  const height = 110;
+  const padding = 15;
+  
+  const [scanY, setScanY] = useState(padding);
+  const direction = useRef(1);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setScanY((prev) => {
+        let next = prev + direction.current * 1.2;
+        if (next >= height - padding) {
+          direction.current = -1;
+          next = height - padding;
+        } else if (next <= padding) {
+          direction.current = 1;
+          next = padding;
+        }
+        return next;
+      });
+    }, 30);
+    return () => clearInterval(interval);
+  }, []);
+
+  return (
+    <div className="bg-black/40 border border-primary/10 rounded p-2 text-center font-mono">
+      <span className="text-[8px] text-gray-500 uppercase tracking-wider block mb-1.5 font-bold">ALTITUDE ELEVATION SCAN</span>
+      <svg width="100%" height={height} viewBox={`0 0 ${width} ${height}`} className="bg-black/60 border border-primary/5 rounded">
+        <line x1={padding} y1={height / 2} x2={width - padding} y2={height / 2} stroke="rgba(0, 255, 255, 0.04)" />
+        <line x1={width / 2} y1={padding} x2={width / 2} y2={height - padding} stroke="rgba(0, 255, 255, 0.04)" />
+        <line x1={padding} y1={scanY} x2={width - padding} y2={scanY} stroke="rgba(0, 255, 255, 0.15)" strokeWidth="1" />
+        
+        {targets.map((tgt) => {
+          const x = padding + (tgt.distance / 200) * (width - 2 * padding);
+          const y = height - padding - (tgt.elevation / 90) * (height - 2 * padding);
+          const isSelected = selectedTargetId === tgt.id;
+
+          return (
+            <g key={tgt.id}>
+              <circle
+                cx={x}
+                cy={y}
+                r={isSelected ? "3.5" : "1.5"}
+                fill={isSelected ? "#EF4444" : "#00FFFF"}
+                className={isSelected ? "animate-pulse" : ""}
+              />
+              {isSelected && (
+                <circle cx={x} cy={y} r="6" stroke="#EF4444" strokeWidth="0.5" fill="none" className="animate-ping" />
+              )}
+            </g>
+          );
+        })}
+      </svg>
+    </div>
+  );
+}
+
+// 2. Sector Scan Mini-Radar Component (High-Velocity sweeping)
+function SectorScan({ targets, selectedTargetId }: { targets: RadarTarget[]; selectedTargetId: string | null }) {
+  const width = 280;
+  const height = 110;
+  const centerX = width / 2;
+  const centerY = height - 8;
+  const maxRadius = height - 15;
+
+  const [sweepAngle, setSweepAngle] = useState(45);
+  const direction = useRef(1);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setSweepAngle((prev) => {
+        let next = prev + direction.current * 1.8;
+        if (next >= 135) {
+          direction.current = -1;
+          next = 135;
+        } else if (next <= 45) {
+          direction.current = 1;
+          next = 45;
+        }
+        return next;
+      });
+    }, 25);
+    return () => clearInterval(interval);
+  }, []);
+
+  const sweepRad = (sweepAngle - 180) * (Math.PI / 180);
+
+  return (
+    <div className="bg-black/40 border border-primary/10 rounded p-2 text-center font-mono">
+      <span className="text-[8px] text-gray-500 uppercase tracking-wider block mb-1.5 font-bold">GIMBAL ARC SECTOR SCAN</span>
+      <svg width="100%" height={height} viewBox={`0 0 ${width} ${height}`} className="bg-black/60 border border-primary/5 rounded overflow-hidden">
+        <path
+          d={`M ${centerX + maxRadius * Math.cos(-Math.PI * 0.75)} ${centerY + maxRadius * Math.sin(-Math.PI * 0.75)} 
+             A ${maxRadius} ${maxRadius} 0 0 1 ${centerX + maxRadius * Math.cos(-Math.PI * 0.25)} ${centerY + maxRadius * Math.sin(-Math.PI * 0.25)}`}
+          fill="none"
+          stroke="rgba(0, 255, 255, 0.08)"
+          strokeWidth="1"
+        />
+        <line x1={centerX} y1={centerY} x2={centerX + maxRadius * Math.cos(-Math.PI * 0.75)} y2={centerY + maxRadius * Math.sin(-Math.PI * 0.75)} stroke="rgba(0, 255, 255, 0.03)" />
+        <line x1={centerX} y1={centerY} x2={centerX + maxRadius * Math.cos(-Math.PI * 0.25)} y2={centerY + maxRadius * Math.sin(-Math.PI * 0.25)} stroke="rgba(0, 255, 255, 0.03)" />
+        
+        <line
+          x1={centerX}
+          y1={centerY}
+          x2={centerX + maxRadius * Math.cos(sweepRad)}
+          y2={centerY + maxRadius * Math.sin(sweepRad)}
+          stroke="rgba(0, 255, 255, 0.3)"
+          strokeWidth="1"
+        />
+
+        {targets.map((tgt) => {
+          const normBearing = 45 + (tgt.bearing % 90); 
+          const targetRad = (normBearing - 180) * (Math.PI / 180);
+          const distPercent = tgt.distance / 200;
+          const targetRadius = distPercent * maxRadius;
+
+          const tx = centerX + targetRadius * Math.cos(targetRad);
+          const ty = centerY + targetRadius * Math.sin(targetRad);
+          const isSelected = selectedTargetId === tgt.id;
+
+          return (
+            <circle
+              key={tgt.id}
+              cx={tx}
+              cy={ty}
+              r={isSelected ? "3" : "1.5"}
+              fill={isSelected ? "#EF4444" : "rgba(0, 255, 255, 0.5)"}
+            />
+          );
+        })}
+      </svg>
+    </div>
+  );
+}
+
+// 3. Spectral Wave Spectrogram Mini-Radar Component (Target lock-on wave)
+function SignalSpectrumAnalyzer({ selectedTarget }: { selectedTarget: RadarTarget | null }) {
+  const width = 280;
+  const height = 110;
+  const [phase, setPhase] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setPhase((prev) => (prev + 0.18) % (2 * Math.PI));
+    }, 30);
+    return () => clearInterval(interval);
+  }, []);
+
+  const points: string[] = [];
+  const amplitude = selectedTarget ? 24 : 6;
+  const frequency = selectedTarget ? 5 : 2;
+
+  for (let x = 0; x <= width; x += 5) {
+    const y = height / 2 + Math.sin((x / width) * Math.PI * frequency + phase) * amplitude 
+                 + Math.cos((x / width) * Math.PI * 12 + phase * 1.5) * (amplitude * 0.15);
+    points.push(`${x},${y.toFixed(1)}`);
+  }
+
+  return (
+    <div className="bg-black/40 border border-primary/10 rounded p-2 text-center font-mono">
+      <span className="text-[8px] text-gray-500 uppercase tracking-wider block mb-1.5 font-bold">FREQUENCY SPECTRUM SCAN</span>
+      <svg width="100%" height={height} viewBox={`0 0 ${width} ${height}`} className="bg-black/60 border border-primary/5 rounded">
+        <line x1="0" y1={height / 2} x2={width} y2={height / 2} stroke="rgba(0, 255, 255, 0.04)" />
+        <polyline
+          points={points.join(" ")}
+          fill="none"
+          stroke={selectedTarget ? "#EF4444" : "#00FFFF"}
+          strokeWidth="1.2"
+        />
+        {selectedTarget && (
+          <text x="10" y="20" fill="#EF4444" className="text-[8px] uppercase animate-pulse font-bold">
+            LOCK SIG: {selectedTarget.id} ({(selectedTarget.speed * 0.035).toFixed(2)} GHz)
+          </text>
+        )}
+      </svg>
+    </div>
+  );
 }
 
 export default function RadarControlPage() {
@@ -64,7 +245,7 @@ export default function RadarControlPage() {
     }
   };
 
-  // Setup mount fetch and periodic telemetry polling with AbortController and Page Visibility API
+  // Setup periodic telemetry polling with AbortController and Page Visibility API
   useEffect(() => {
     let pollInterval: NodeJS.Timeout | null = null;
     let controller = new AbortController();
@@ -72,7 +253,7 @@ export default function RadarControlPage() {
     const startPolling = () => {
       if (pollInterval) return;
       pollInterval = setInterval(() => {
-        controller.abort(); // Cancel previous if still pending
+        controller.abort();
         controller = new AbortController();
         fetchRadarTargets(true, controller.signal);
       }, 5000);
@@ -83,7 +264,7 @@ export default function RadarControlPage() {
         clearInterval(pollInterval);
         pollInterval = null;
       }
-      controller.abort(); // Cancel current request immediately
+      controller.abort();
     };
 
     const handleVisibilityChange = () => {
@@ -97,7 +278,6 @@ export default function RadarControlPage() {
       }
     };
 
-    // Initial load
     fetchRadarTargets(false, controller.signal);
     startPolling();
 
@@ -121,56 +301,14 @@ export default function RadarControlPage() {
 
   return (
     <BaseLayout>
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 font-mono text-sm">
+      <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 font-mono text-sm">
         
-        {/* Main Radar sweep grid */}
-        <div className="lg:col-span-3 flex flex-col space-y-4">
-          <Panel
-            title="AETHER GLOBAL SCANS"
-            subtitle="Futuristic Concentric Target Tracking HUD"
-            statusIndicator="healthy"
-            headerActions={
-              <div className="flex space-x-2 text-xs">
-                <button
-                  onClick={() => handleSelectTarget(null)}
-                  disabled={!selectedTargetId}
-                  className="px-2 py-1 bg-black border border-primary/20 hover:border-primary text-primary transition disabled:opacity-30 disabled:pointer-events-none active:scale-95"
-                >
-                  [¤] RESET LOCKS
-                </button>
-              </div>
-            }
-          >
-            {isLoading && targets.length === 0 ? (
-              <div className="w-full h-[500px] flex flex-col items-center justify-center bg-black/20 border border-primary/10 rounded">
-                <div className="text-primary text-xs uppercase tracking-widest animate-pulse mb-2">
-                  TUNING RADAR FREQUENCY BANDS...
-                </div>
-                <div className="w-32 h-0.5 bg-primary/10 overflow-hidden relative">
-                  <div className="absolute top-0 left-0 h-full w-1/2 bg-primary animate-pulse" />
-                </div>
-              </div>
-            ) : (
-              <RadarDisplay
-                targets={targets}
-                selectedTargetId={selectedTargetId}
-                onSelectTarget={handleSelectTarget}
-                showNoise={showNoise}
-                maxRange={maxRange}
-                sweepSpeed={sweepSpeed}
-              />
-            )}
-          </Panel>
-        </div>
-
-        {/* Sidebar Controls and Locks Dashboard */}
+        {/* Left Column: Configurations + Target details locks */}
         <div className="lg:col-span-1 flex flex-col space-y-6">
-
-          {/* Configuration Panel */}
+          
+          {/* Configurations */}
           <Panel title="scan configurations">
             <div className="space-y-4">
-              
-              {/* Range Scale Selector */}
               <div>
                 <label className="block text-[10px] text-gray-500 uppercase tracking-wider mb-2">Range Scale (KM)</label>
                 <div className="grid grid-cols-3 gap-1 bg-black p-1 border border-primary/15 rounded">
@@ -190,7 +328,6 @@ export default function RadarControlPage() {
                 </div>
               </div>
 
-              {/* Sweep Speed Selector */}
               <div>
                 <label className="block text-[10px] text-gray-500 uppercase tracking-wider mb-2">Sweep Velocity</label>
                 <div className="grid grid-cols-3 gap-1 bg-black p-1 border border-primary/15 rounded">
@@ -214,7 +351,6 @@ export default function RadarControlPage() {
                 </div>
               </div>
 
-              {/* Static Noise toggler */}
               <div className="flex items-center justify-between border-t border-primary/10 pt-3">
                 <span className="text-xs text-gray-400">SIGNAL STATIC NOISE</span>
                 <button
@@ -228,11 +364,10 @@ export default function RadarControlPage() {
                   {showNoise ? "ON" : "OFF"}
                 </button>
               </div>
-
             </div>
           </Panel>
 
-          {/* Locked-on target details telemetry */}
+          {/* Locked-on details */}
           <Panel 
             title="target locking matrix" 
             subtitle="Detailed active tracker bounds"
@@ -291,14 +426,64 @@ export default function RadarControlPage() {
             )}
           </Panel>
 
-          {/* List of active targets */}
+        </div>
+
+        {/* Center Main Columns: Central Radar + 3 Mini Radars Row */}
+        <div className="lg:col-span-3 flex flex-col space-y-6">
+          
+          {/* Main Central Radar HUD */}
+          <Panel
+            title="AETHER MULTI-SPECTRAL RADAR DECK"
+            subtitle="GPU-optimized concentric target sweep tracker"
+            statusIndicator="healthy"
+            headerActions={
+              <button
+                onClick={() => handleSelectTarget(null)}
+                disabled={!selectedTargetId}
+                className="px-2 py-1 bg-black border border-primary/20 hover:border-primary text-primary transition disabled:opacity-30 disabled:pointer-events-none active:scale-95 text-xs"
+              >
+                [¤] RESET LOCKS
+              </button>
+            }
+          >
+            {isLoading && targets.length === 0 ? (
+              <div className="w-full h-[500px] flex flex-col items-center justify-center bg-black/20 border border-primary/10 rounded">
+                <span className="text-primary text-xs uppercase tracking-widest animate-pulse mb-2">TUNING RADAR FREQUENCY BANDS...</span>
+                <div className="w-32 h-0.5 bg-primary/10 overflow-hidden relative">
+                  <div className="absolute top-0 left-0 h-full w-1/2 bg-primary animate-pulse" />
+                </div>
+              </div>
+            ) : (
+              <RadarDisplay
+                targets={targets}
+                selectedTargetId={selectedTargetId}
+                onSelectTarget={handleSelectTarget}
+                showNoise={showNoise}
+                maxRange={maxRange}
+                sweepSpeed={sweepSpeed}
+              />
+            )}
+          </Panel>
+
+          {/* Secondary Subsystem Mini-Radars Row */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <OrbitalElevationScan targets={targets} selectedTargetId={selectedTargetId} />
+            <SectorScan targets={targets} selectedTargetId={selectedTargetId} />
+            <SignalSpectrumAnalyzer selectedTarget={selectedTarget} />
+          </div>
+
+        </div>
+
+        {/* Right Column: Active Targets Feed list */}
+        <div className="lg:col-span-1 flex flex-col">
+          
           <Panel title={`active targets feed (${targets.length})`}>
             {errorMsg && (
-              <div className="text-[10px] text-red-400 bg-red-950/20 border border-red-500/30 p-2 rounded uppercase">
+              <div className="text-[10px] text-red-400 bg-red-950/20 border border-red-500/30 p-2 rounded uppercase mb-2">
                 ERROR: {errorMsg}
               </div>
             )}
-            <div className="space-y-2 max-h-56 overflow-y-auto pr-1">
+            <div className="space-y-2 max-h-[660px] overflow-y-auto pr-1">
               {targets.length === 0 ? (
                 <div className="text-center text-xs text-gray-600 py-3 italic">
                   Scanning empty frequency bounds...
@@ -308,7 +493,7 @@ export default function RadarControlPage() {
                   <button
                     key={tgt.id}
                     onClick={() => handleSelectTarget(tgt)}
-                    className={`w-full flex items-center justify-between p-2 border rounded transition text-xs ${
+                    className={`w-full flex items-center justify-between p-2.5 border rounded transition text-xs ${
                       selectedTargetId === tgt.id
                         ? "border-[#EF4444] bg-[#EF4444]/5 text-[#EF4444]"
                         : "border-primary/10 bg-black/20 text-gray-300 hover:border-primary/30"
