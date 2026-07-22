@@ -7,6 +7,7 @@ from backend.api.v1.radar import router as radar_router
 from backend.api.v1.research import router as research_router
 from backend.api.v1.logs import router as logs_router
 from backend.api.v1.datasets import router as datasets_router
+from backend.api.v1.experiments import router as experiments_router
 
 api_router = APIRouter()
 
@@ -19,3 +20,4 @@ api_router.include_router(radar_router, prefix="/radar", tags=["radar"])
 api_router.include_router(research_router, prefix="/research", tags=["research"])
 api_router.include_router(logs_router, prefix="/logs", tags=["logs"])
 api_router.include_router(datasets_router, prefix="/datasets", tags=["datasets"])
+api_router.include_router(experiments_router, prefix="/experiments", tags=["experiments"])
