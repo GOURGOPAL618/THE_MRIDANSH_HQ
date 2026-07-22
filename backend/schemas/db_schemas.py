@@ -164,6 +164,13 @@ class DatasetBase(BaseModel):
 class DatasetCreate(DatasetBase):
     pass
 
+class DatasetUpdate(BaseModel):
+    dataset_name: Optional[str] = Field(None, max_length=255)
+    category: Optional[str] = Field(None, max_length=100)
+    source: Optional[str] = Field(None, max_length=255)
+    description: Optional[str] = None
+    location: Optional[str] = Field(None, max_length=255)
+
 class DatasetOut(DatasetBase):
     id: uuid.UUID
     created_at: datetime
