@@ -12,8 +12,8 @@ from backend.database.session import get_db
 from backend.schemas.responses import ApiResponse, make_response
 from backend.security.auth_deps import get_current_commander
 from backend.models.models import Commander, EngineLog
-from backend.repositories.repos import engine_log_repo
-from backend.schemas.db_schemas import EngineLogCreate, EngineLogOut
+from backend.repositories.repos import engine_log_repo, log_repo
+from backend.schemas.db_schemas import EngineLogCreate, EngineLogOut, ActivityLogCreate
 
 router = APIRouter()
 logger = logging.getLogger("system")
@@ -247,6 +247,14 @@ async def ignite_engine(current_commander: Commander = Depends(get_current_comma
         )
         engine_log_repo.create(db, obj_in=new_log)
         
+        # Log to operational ActivityLog
+        log_repo.create(db, obj_in=ActivityLogCreate(
+            module="engine",
+            action="ignition",
+            description=f"Engine ignition sequence initiated by Commander '{current_commander.username}'",
+            severity="info"
+        ))
+        
         logger.info(f"Engine ignition sequence initiated by Commander '{current_commander.username}'")
         return make_response(
             success=True,
@@ -286,6 +294,14 @@ async def shutdown_engine(current_commander: Commander = Depends(get_current_com
         )
         engine_log_repo.create(db, obj_in=new_log)
         
+        # Log to operational ActivityLog
+        log_repo.create(db, obj_in=ActivityLogCreate(
+            module="engine",
+            action="shutdown",
+            description=f"Engine cooling shutdown initiated by Commander '{current_commander.username}'",
+            severity="info"
+        ))
+        
         logger.info(f"Engine cooling shutdown initiated by Commander '{current_commander.username}'")
         return make_response(
             success=True,
@@ -320,6 +336,14 @@ async def emergency_stop_engine(current_commander: Commander = Depends(get_curre
         )
         engine_log_repo.create(db, obj_in=new_log)
         
+        # Log to operational ActivityLog
+        log_repo.create(db, obj_in=ActivityLogCreate(
+            module="engine",
+            action="emergency_stop",
+            description=f"REACTOR EMERGENCY SHUTDOWN triggered by Commander '{current_commander.username}'",
+            severity="error"
+        ))
+        
         security_logger.warning(f"REACTOR EMERGENCY STOP TRIGGERED by Commander '{current_commander.username}'")
         return make_response(
             success=True,
@@ -353,6 +377,14 @@ async def reset_engine(current_commander: Commander = Depends(get_current_comman
             magnetic_lock=True
         )
         engine_log_repo.create(db, obj_in=new_log)
+        
+        # Log to operational ActivityLog
+        log_repo.create(db, obj_in=ActivityLogCreate(
+            module="engine",
+            action="reset",
+            description=f"Reactor safety lock reset command executed by Commander '{current_commander.username}'",
+            severity="warning"
+        ))
         
         logger.info(f"Reactor safety lock reset by Commander '{current_commander.username}'")
         return make_response(
@@ -391,6 +423,14 @@ async def throttle_engine(payload: ThrottleRequest, current_commander: Commander
             magnetic_lock=True
         )
         engine_log_repo.create(db, obj_in=new_log)
+        
+        # Log to operational ActivityLog
+        log_repo.create(db, obj_in=ActivityLogCreate(
+            module="engine",
+            action="throttle",
+            description=f"Engine thrust manual throttle adjusted to {payload.thrust_level}% by Commander '{current_commander.username}'",
+            severity="info"
+        ))
         
         logger.info(f"Engine throttle set to {payload.thrust_level}% by Commander '{current_commander.username}'")
         return make_response(
