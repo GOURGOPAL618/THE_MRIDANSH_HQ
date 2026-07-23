@@ -1,7 +1,7 @@
 import uuid
 from datetime import datetime
 from typing import List, Optional, Any
-from sqlalchemy import String, Boolean, Float, DateTime, Text, JSON, ForeignKey, Uuid, func
+from sqlalchemy import String, Boolean, Float, DateTime, Text, JSON, ForeignKey, Uuid, func, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from backend.database.session import Base
 
@@ -21,6 +21,8 @@ class Commander(Base):
     settings: Mapped["Settings"] = relationship("Settings", back_populates="commander", uselist=False, cascade="all, delete-orphan")
     bookmarks: Mapped[List["EarthBookmark"]] = relationship("EarthBookmark", back_populates="commander", cascade="all, delete-orphan")
     notifications: Mapped[List["Notification"]] = relationship("Notification", back_populates="commander", cascade="all, delete-orphan")
+    recent_searches: Mapped[List["RecentSearch"]] = relationship("RecentSearch", back_populates="commander", cascade="all, delete-orphan")
+    pinned_results: Mapped[List["PinnedResult"]] = relationship("PinnedResult", back_populates="commander", cascade="all, delete-orphan")
 
 
 class CommanderSession(Base):
@@ -152,4 +154,37 @@ class Notification(Base):
 
     # Relationships
     commander: Mapped["Commander"] = relationship("Commander", back_populates="notifications")
+
+
+class RecentSearch(Base):
+    __tablename__ = "recent_searches"
+
+    id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True, default=uuid.uuid4)
+    commander_id: Mapped[uuid.UUID] = mapped_column(Uuid, ForeignKey("commanders.id", ondelete="CASCADE"), index=True, nullable=False)
+    query: Mapped[str] = mapped_column(String(255), nullable=False)
+    normalized_query: Mapped[str] = mapped_column(String(255), index=True, nullable=False)
+    timestamp: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), index=True, nullable=False)
+
+    # Relationships
+    commander: Mapped["Commander"] = relationship("Commander", back_populates="recent_searches")
+
+
+class PinnedResult(Base):
+    __tablename__ = "pinned_results"
+
+    id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True, default=uuid.uuid4)
+    commander_id: Mapped[uuid.UUID] = mapped_column(Uuid, ForeignKey("commanders.id", ondelete="CASCADE"), index=True, nullable=False)
+    item_id: Mapped[str] = mapped_column(String(100), index=True, nullable=False)
+    item_type: Mapped[str] = mapped_column(String(50), index=True, nullable=False)
+    title: Mapped[str] = mapped_column(String(255), nullable=False)
+    url: Mapped[str] = mapped_column(String(255), nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)
+
+    __table_args__ = (
+        UniqueConstraint("commander_id", "item_id", "item_type", name="uq_pinned_result"),
+    )
+
+    # Relationships
+    commander: Mapped["Commander"] = relationship("Commander", back_populates="pinned_results")
+
 

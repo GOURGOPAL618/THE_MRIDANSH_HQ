@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState, useRef } from "react";
 import { AnimatePresence, motion } from "framer-motion";
+import { useRouter } from "next/navigation";
 import { useAudio } from "../hooks/useAudio";
 import { logger } from "../utils/logger";
 
@@ -14,6 +15,7 @@ export interface CommandItem {
 }
 
 export function CommandPalette() {
+  const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const [search, setSearch] = useState("");
   const [selectedIndex, setSelectedIndex] = useState(0);
@@ -23,40 +25,85 @@ export function CommandPalette() {
   // Static baseline command registry (architecture only, actions print log prompts or run mock toggles)
   const registry: CommandItem[] = [
     {
+      id: "navigate-search",
+      name: "Navigate: Search Center Cockpit",
+      category: "Navigation",
+      action: () => {
+        logger.info("Macro navigation command: Search", "CMD-PALETTE");
+        router.push("/search");
+      },
+    },
+    {
       id: "navigate-dashboard",
       name: "Navigate: Dashboard Cockpit",
       category: "Navigation",
-      action: () => logger.info("Macro navigation command: Dashboard", "CMD-PALETTE"),
+      action: () => {
+        logger.info("Macro navigation command: Dashboard", "CMD-PALETTE");
+        router.push("/dashboard");
+      },
     },
     {
       id: "navigate-earth",
       name: "Navigate: Earth Operations",
       category: "Navigation",
-      action: () => logger.info("Macro navigation command: Earth Operations", "CMD-PALETTE"),
+      action: () => {
+        logger.info("Macro navigation command: Earth Operations", "CMD-PALETTE");
+        router.push("/earth");
+      },
     },
     {
       id: "navigate-radar",
       name: "Navigate: Radar Control Room",
       category: "Navigation",
-      action: () => logger.info("Macro navigation command: Radar Control", "CMD-PALETTE"),
+      action: () => {
+        logger.info("Macro navigation command: Radar Control", "CMD-PALETTE");
+        router.push("/radar");
+      },
     },
     {
       id: "navigate-engine",
       name: "Navigate: Engine Room Diagnostics",
       category: "Navigation",
-      action: () => logger.info("Macro navigation command: Engine Room", "CMD-PALETTE"),
+      action: () => {
+        logger.info("Macro navigation command: Engine Room", "CMD-PALETTE");
+        router.push("/engine");
+      },
     },
     {
-      id: "audio-mute",
-      name: "Audio: Toggle Muted Status",
-      category: "Settings",
-      action: () => logger.info("Macro command: Toggle Muted Status", "CMD-PALETTE"),
+      id: "navigate-settings",
+      name: "Navigate: Cockpit Settings Vault",
+      category: "Navigation",
+      action: () => {
+        logger.info("Macro navigation command: Settings", "CMD-PALETTE");
+        router.push("/settings");
+      },
+    },
+    {
+      id: "navigate-logs",
+      name: "Navigate: Mission Activity Logs",
+      category: "Navigation",
+      action: () => {
+        logger.info("Macro navigation command: Logs", "CMD-PALETTE");
+        router.push("/logs");
+      },
+    },
+    {
+      id: "navigate-notifications",
+      name: "Navigate: Central Notification Center",
+      category: "Navigation",
+      action: () => {
+        logger.info("Macro navigation command: Notifications", "CMD-PALETTE");
+        router.push("/notifications");
+      },
     },
     {
       id: "system-lockdown",
       name: "System: Trigger Emergency Lockdown",
       category: "Security",
-      action: () => logger.warn("Macro command: EMERGENCY SYSTEM LOCKDOWN TRIGGERED", "SECURITY"),
+      action: () => {
+        logger.warn("Macro command: EMERGENCY SYSTEM LOCKDOWN TRIGGERED", "SECURITY");
+        router.push("/security");
+      },
     },
   ];
 
@@ -86,10 +133,24 @@ export function CommandPalette() {
     }
   }, [isOpen]);
 
-  const filteredCommands = registry.filter((cmd) =>
-    cmd.name.toLowerCase().includes(search.toLowerCase()) ||
-    cmd.category.toLowerCase().includes(search.toLowerCase())
-  );
+  const dynamicCommands: CommandItem[] = search.trim() ? [
+    {
+      id: "search-query",
+      name: `Search Cockpit for: "${search.trim()}"`,
+      category: "Search",
+      action: () => {
+        router.push(`/search?q=${encodeURIComponent(search.trim())}`);
+      }
+    }
+  ] : [];
+
+  const filteredCommands = [
+    ...dynamicCommands,
+    ...registry.filter((cmd) =>
+      cmd.name.toLowerCase().includes(search.toLowerCase()) ||
+      cmd.category.toLowerCase().includes(search.toLowerCase())
+    )
+  ];
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Escape") {

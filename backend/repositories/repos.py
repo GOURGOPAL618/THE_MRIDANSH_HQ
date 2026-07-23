@@ -13,7 +13,9 @@ from backend.models.models import (
     Dataset,
     Experiment,
     EarthBookmark,
-    Notification
+    Notification,
+    RecentSearch,
+    PinnedResult
 )
 from backend.schemas.db_schemas import (
     CommanderCreate, CommanderUpdate,
@@ -25,7 +27,8 @@ from backend.schemas.db_schemas import (
     ResearchCreate, ResearchUpdate,
     DatasetCreate, DatasetUpdate,
     ExperimentCreate, ExperimentUpdate,
-    NotificationCreate, NotificationUpdate
+    NotificationCreate, NotificationUpdate,
+    RecentSearchCreate, PinnedResultCreate
 )
 
 class CommanderRepository(BaseRepository[Commander, CommanderCreate, CommanderUpdate]):
@@ -113,4 +116,23 @@ class NotificationRepository(BaseRepository[Notification, NotificationCreate, No
 
 
 notification_repo = NotificationRepository(Notification)
+
+
+class RecentSearchRepository(BaseRepository[RecentSearch, RecentSearchCreate, Any := Any]):
+    def get_by_commander(self, db: Session, *, commander_id: uuid.UUID, limit: int = 20) -> List[RecentSearch]:
+        return db.query(self.model).filter(
+            self.model.commander_id == commander_id
+        ).order_by(self.model.timestamp.desc()).limit(limit).all()
+
+
+class PinnedResultRepository(BaseRepository[PinnedResult, PinnedResultCreate, Any := Any]):
+    def get_by_commander(self, db: Session, *, commander_id: uuid.UUID) -> List[PinnedResult]:
+        return db.query(self.model).filter(
+            self.model.commander_id == commander_id
+        ).order_by(self.model.created_at.desc()).all()
+
+
+recent_search_repo = RecentSearchRepository(RecentSearch)
+pinned_result_repo = PinnedResultRepository(PinnedResult)
+
 

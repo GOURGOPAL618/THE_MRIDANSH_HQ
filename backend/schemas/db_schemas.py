@@ -225,3 +225,40 @@ class NotificationOut(NotificationBase):
     class Config:
         from_attributes = True
 
+
+# --- SEARCH HISTORY SCHEMAS ---
+class RecentSearchBase(BaseModel):
+    query: str
+
+class RecentSearchCreate(RecentSearchBase):
+    pass
+
+class RecentSearchOut(RecentSearchBase):
+    id: uuid.UUID
+    commander_id: uuid.UUID
+    normalized_query: str
+    timestamp: datetime
+
+    class Config:
+        from_attributes = True
+
+
+# --- PINNED RESULT SCHEMAS ---
+class PinnedResultBase(BaseModel):
+    item_id: str
+    item_type: str
+    title: str
+    url: str
+
+class PinnedResultCreate(PinnedResultBase):
+    pass
+
+class PinnedResultOut(PinnedResultBase):
+    id: uuid.UUID
+    commander_id: uuid.UUID
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
+
+

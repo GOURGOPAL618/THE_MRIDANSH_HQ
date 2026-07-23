@@ -96,4 +96,12 @@ export const MODULES: ModuleItem[] = [
     description: "Centralized notification timeline and priority alert history.",
     clearanceLevel: "commander",
   },
+  {
+    id: "search",
+    name: "Search Center",
+    path: "/search",
+    iconName: "search",
+    description: "Universal search engine across notes, telemetry databases, and files.",
+    clearanceLevel: "commander",
+  },
 ];
