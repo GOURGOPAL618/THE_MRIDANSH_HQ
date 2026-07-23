@@ -11,7 +11,7 @@ from pydantic import BaseModel, Field
 from backend.database.session import get_db
 from backend.schemas.responses import ApiResponse, make_response
 from backend.security.auth_deps import get_current_commander
-from backend.models.models import Commander, EngineLog
+from backend.models.models import Commander, EngineLog, Notification
 from backend.repositories.repos import engine_log_repo, log_repo
 from backend.schemas.db_schemas import EngineLogCreate, EngineLogOut, ActivityLogCreate
 
@@ -255,6 +255,15 @@ async def ignite_engine(current_commander: Commander = Depends(get_current_comma
             severity="info"
         ))
         
+        # Dispatch database Notification
+        db.add(Notification(
+            commander_id=current_commander.id,
+            type="engine",
+            title="Engine Ignition Initiated",
+            message="AETHER Engine Reactor Core warmup ignition sweep successfully initiated."
+        ))
+        db.commit()
+        
         logger.info(f"Engine ignition sequence initiated by Commander '{current_commander.username}'")
         return make_response(
             success=True,
@@ -343,6 +352,15 @@ async def emergency_stop_engine(current_commander: Commander = Depends(get_curre
             description=f"REACTOR EMERGENCY SHUTDOWN triggered by Commander '{current_commander.username}'",
             severity="error"
         ))
+        
+        # Dispatch database Notification
+        db.add(Notification(
+            commander_id=current_commander.id,
+            type="critical",
+            title="Reactor Emergency Shutdown",
+            message="REACTOR CORE EMERGENCY SHUTDOWN COMPLETED! Coolant pressure spike released."
+        ))
+        db.commit()
         
         security_logger.warning(f"REACTOR EMERGENCY STOP TRIGGERED by Commander '{current_commander.username}'")
         return make_response(

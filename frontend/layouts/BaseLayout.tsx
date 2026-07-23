@@ -11,6 +11,7 @@ import { useAuth } from "../contexts/AuthContext";
 import { MODULES } from "../constants/modules";
 import { CommandPalette } from "../components/CommandPalette";
 import { LoadingScreen } from "../components/LoadingScreen";
+import { api } from "../services/api";
 
 interface BaseLayoutProps {
   children: ReactNode;
@@ -30,6 +31,45 @@ export function BaseLayout({ children }: BaseLayoutProps) {
   
   const [backendStatus, setBackendStatus] = useState<"online" | "offline">("offline");
   const [isTransitioning, setIsTransitioning] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  // Poll for unread notifications count
+  useEffect(() => {
+    if (!isAuthenticated) {
+      setUnreadCount(0);
+      return;
+    }
+
+    let active = true;
+    const controller = new AbortController();
+
+    const fetchUnread = async () => {
+      if (document.visibilityState !== "visible") return;
+      try {
+        const response = await api.get<{
+          success: boolean;
+          message: string;
+          data: {
+            count: number;
+          };
+        }>("/api/v1/notifications/unread-count");
+        if (active && response.data && response.data.success) {
+          setUnreadCount(response.data.data.count);
+        }
+      } catch {
+        // Silently fail to prevent UI layout disruptions
+      }
+    };
+
+    fetchUnread();
+    const interval = setInterval(fetchUnread, 5000);
+
+    return () => {
+      active = false;
+      controller.abort();
+      clearInterval(interval);
+    };
+  }, [isAuthenticated]);
 
   // Sync System time (UTC) - client side only to prevent hydration mismatch
   useEffect(() => {
@@ -153,6 +193,12 @@ export function BaseLayout({ children }: BaseLayoutProps) {
             <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.57-.598-3.75h-.152c-3.196 0-6.1-1.249-8.25-3.286zm0 13.036h.008v.008H12v-.008z" />
           </svg>
         );
+      case "bell":
+        return (
+          <svg {...iconProps}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M14.857 17.082a9.04 9.04 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0M3.124 7.5A8.969 8.969 0 015.292 3m13.416 4.5a8.969 8.969 0 00-2.168-4.5M19 18.75a.75.75 0 11-1.5 0 .75.75 0 011.5 0zM4 9a8 8 0 0116 0c0 3-1.25 5.5-3 7.5a14.37 14.37 0 01-10 0C5.25 14.5 4 12 4 9z" />
+          </svg>
+        );
       case "cog":
         return (
           <svg {...iconProps}>
@@ -262,7 +308,7 @@ export function BaseLayout({ children }: BaseLayoutProps) {
                   key={mod.id}
                   href={mod.path}
                   onClick={() => playClick()}
-                  className={`w-full flex items-center space-x-3 px-3 py-2.5 rounded text-xs font-mono border transition-all duration-200 ${
+                  className={`w-full flex items-center space-x-3 px-3 py-2.5 rounded text-xs font-mono border transition-all duration-200 relative ${
                     isActive
                       ? "bg-primary/20 text-[#00FFFF] border-primary/20 shadow-glow"
                       : "text-gray-400 border-transparent hover:text-white hover:bg-[#0E1525]"
@@ -274,6 +320,13 @@ export function BaseLayout({ children }: BaseLayoutProps) {
                   {!isSidebarCollapsed && (
                     <span className="font-bold tracking-wider text-left flex-1 truncate uppercase">
                       {mod.name}
+                    </span>
+                  )}
+                  {mod.id === "notifications" && unreadCount > 0 && (
+                    <span className={`px-1.5 py-0.5 rounded-full text-[8px] font-bold bg-[#EF4444] text-white shrink-0 ${
+                      isSidebarCollapsed ? "absolute top-1.5 right-1.5" : ""
+                    }`}>
+                      {unreadCount}
                     </span>
                   )}
                 </Link>

@@ -88,4 +88,12 @@ export const MODULES: ModuleItem[] = [
     description: "Cockpit audio volumes, active sub-themes, and security overrides.",
     clearanceLevel: "commander",
   },
+  {
+    id: "notifications",
+    name: "Notifications",
+    path: "/notifications",
+    iconName: "bell",
+    description: "Centralized notification timeline and priority alert history.",
+    clearanceLevel: "commander",
+  },
 ];

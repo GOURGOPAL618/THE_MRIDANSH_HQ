@@ -12,7 +12,8 @@ from backend.models.models import (
     Research,
     Dataset,
     Experiment,
-    EarthBookmark
+    EarthBookmark,
+    Notification
 )
 from backend.schemas.db_schemas import (
     CommanderCreate, CommanderUpdate,
@@ -22,8 +23,9 @@ from backend.schemas.db_schemas import (
     SecurityEventCreate,
     EngineLogCreate,
     ResearchCreate, ResearchUpdate,
-    DatasetCreate,
-    ExperimentCreate, ExperimentUpdate
+    DatasetCreate, DatasetUpdate,
+    ExperimentCreate, ExperimentUpdate,
+    NotificationCreate, NotificationUpdate
 )
 
 class CommanderRepository(BaseRepository[Commander, CommanderCreate, CommanderUpdate]):
@@ -101,3 +103,14 @@ research_repo = ResearchRepository(Research)
 dataset_repo = DatasetRepository(Dataset)
 experiment_repo = ExperimentRepository(Experiment)
 bookmark_repo = EarthBookmarkRepository(EarthBookmark)
+
+
+class NotificationRepository(BaseRepository[Notification, NotificationCreate, NotificationUpdate]):
+    def get_by_commander(self, db: Session, *, commander_id: uuid.UUID, skip: int = 0, limit: int = 100) -> List[Notification]:
+        return db.query(self.model).filter(
+            self.model.commander_id == commander_id
+        ).order_by(self.model.timestamp.desc()).offset(skip).limit(limit).all()
+
+
+notification_repo = NotificationRepository(Notification)
+

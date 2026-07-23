@@ -6,38 +6,36 @@ from sqlalchemy.orm import Session
 from backend.database.session import get_db
 from backend.schemas.responses import ApiResponse, make_response
 from backend.security.auth_deps import get_current_commander
-from backend.models.models import Commander, Dataset
+from backend.models.models import Commander, Dataset, Notification
 from backend.repositories.repos import dataset_repo
 from backend.schemas.db_schemas import DatasetCreate, DatasetUpdate
 
 router = APIRouter()
 
 @router.get("", response_model=ApiResponse)
-async def get_all_datasets(
-    search: Optional[str] = None,
+async def get_datasets(
     category: Optional[str] = None,
+    search: Optional[str] = None,
+    limit: int = 100,
+    skip: int = 0,
     current_commander: Commander = Depends(get_current_commander),
     db: Session = Depends(get_db)
 ):
     """
-    Retrieve datasets catalog with search and category filters working independently or together.
+    List datasets with filters.
     """
     query = db.query(Dataset)
     
-    # Standard SQLite/Postgres database filters
+    # Combined search and category filters
     if category and category.upper() != "ALL":
         query = query.filter(Dataset.category == category)
-        
-    items = query.order_by(Dataset.created_at.desc()).all()
-    
-    # Search filter applied in Python for robust case-insensitive contains logic
     if search:
-        search_lower = search.lower()
-        items = [
-            i for i in items
-            if search_lower in i.dataset_name.lower() or search_lower in i.description.lower()
-        ]
+        query = query.filter(
+            (Dataset.dataset_name.contains(search)) | (Dataset.description.contains(search))
+        )
         
+    items = query.order_by(Dataset.created_at.desc()).offset(skip).limit(limit).all()
+    
     result = []
     for item in items:
         result.append({
@@ -98,6 +96,17 @@ async def register_dataset(
     Register a new dataset entry. Does NOT write physical files.
     """
     item = dataset_repo.create(db, obj_in=payload)
+    
+    # Centralized notification mapping
+    db_notif = Notification(
+        commander_id=current_commander.id,
+        type="dataset",
+        title="New Dataset Registered",
+        message=f"Aerospace dataset '{item.dataset_name}' registered successfully under '{item.category}' category."
+    )
+    db.add(db_notif)
+    db.commit()
+    
     return make_response(
         success=True,
         message="Aerospace dataset registered successfully to catalog.",

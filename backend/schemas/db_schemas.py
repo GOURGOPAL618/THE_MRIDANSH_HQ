@@ -202,3 +202,26 @@ class ExperimentOut(ExperimentBase):
 
     class Config:
         from_attributes = True
+
+
+# --- NOTIFICATION SCHEMAS ---
+class NotificationBase(BaseModel):
+    type: str
+    title: str
+    message: str
+
+class NotificationCreate(NotificationBase):
+    pass
+
+class NotificationUpdate(BaseModel):
+    is_read: Optional[bool] = None
+
+class NotificationOut(NotificationBase):
+    id: uuid.UUID
+    commander_id: uuid.UUID
+    timestamp: datetime
+    is_read: bool
+
+    class Config:
+        from_attributes = True
+

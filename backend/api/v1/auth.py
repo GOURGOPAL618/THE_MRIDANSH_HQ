@@ -9,7 +9,7 @@ from backend.core.security_utils import verify_password, create_access_token, de
 from backend.core.logging_config import security_logger
 from backend.security.auth_deps import get_current_commander, get_token_from_request
 from backend.repositories.repos import commander_repo, session_repo, security_event_repo
-from backend.models.models import Commander, CommanderSession, SecurityEvent
+from backend.models.models import Commander, CommanderSession, SecurityEvent, Notification
 from backend.schemas.db_schemas import CommanderLogin, CommanderOut, SecurityEventCreate
 from backend.schemas.responses import ApiResponse, make_response
 
@@ -82,12 +82,21 @@ async def login(
         max_age=settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60
     )
     
-    # 5. Create success audit log
     security_event_repo.create(db, obj_in=SecurityEventCreate(
         event="commander_login",
         risk_level="low",
         details=f"Commander '{username}' successfully logged in from IP {client_ip}. Session ID: {db_session.id}."
     ))
+    
+    # Dispatch database Notification
+    db.add(Notification(
+        commander_id=commander.id,
+        type="security",
+        title="Commander Logged In",
+        message=f"Commander successfully logged in from IP {client_ip}. Security clearance level matches role."
+    ))
+    db.commit()
+    
     security_logger.info(f"Authentication success: Commander '{username}' logged in. Session: {db_session.id}")
     
     return make_response(
