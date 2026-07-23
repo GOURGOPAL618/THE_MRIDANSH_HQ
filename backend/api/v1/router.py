@@ -9,6 +9,7 @@ from backend.api.v1.logs import router as logs_router
 from backend.api.v1.datasets import router as datasets_router
 from backend.api.v1.experiments import router as experiments_router
 from backend.api.v1.security import router as security_router
+from backend.api.v1.settings import router as settings_router
 
 api_router = APIRouter()
 
@@ -23,3 +24,4 @@ api_router.include_router(logs_router, prefix="/logs", tags=["logs"])
 api_router.include_router(datasets_router, prefix="/datasets", tags=["datasets"])
 api_router.include_router(experiments_router, prefix="/experiments", tags=["experiments"])
 api_router.include_router(security_router, prefix="/security", tags=["security"])
+api_router.include_router(settings_router, prefix="/settings", tags=["settings"])

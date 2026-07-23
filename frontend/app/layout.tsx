@@ -1,16 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Inter, JetBrains_Mono } from "next/font/google";
-import "../styles/globals.css";
-
-const inter = Inter({
-  subsets: ["latin"],
-  variable: "--font-sans",
-});
-
-const jetbrainsMono = JetBrains_Mono({
-  subsets: ["latin"],
-  variable: "--font-mono",
-});
+// Fonts are defined locally in globals.css using CSS variables to guarantee offline build stability
 
 export const metadata: Metadata = {
   title: "THE MRIDANSH Command Headquarters",
@@ -27,6 +16,7 @@ export const viewport: Viewport = {
   maximumScale: 1,
 };
 
+import "../styles/globals.css";
 import { ThemeProvider } from "../contexts/ThemeContext";
 import { NotificationProvider } from "../contexts/NotificationContext";
 import { AuthProvider } from "../contexts/AuthContext";
@@ -37,7 +27,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${inter.variable} ${jetbrainsMono.variable}`}>
+    <html lang="en">
       <body className="antialiased bg-background text-white min-h-screen">
         <ThemeProvider>
           <NotificationProvider>
