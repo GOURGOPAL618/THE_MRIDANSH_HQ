@@ -5,6 +5,81 @@ from contextvars import ContextVar
 
 # ContextVar to store request IDs dynamically across async tasks/threads
 request_id_var: ContextVar[str] = ContextVar("request_id", default="-")
+in_db_logging: ContextVar[bool] = ContextVar("in_db_logging", default=False)
+
+class DatabaseLoggingHandler(logging.Handler):
+    """
+    Centralized logging handler that persists log records to the SQLite database.
+    Enforces recursion prevention and resilience against sqlite lock errors.
+    """
+    def emit(self, record: logging.LogRecord) -> None:
+        # 1. Prevent recursion loops using context variable flag
+        if in_db_logging.get():
+            return
+
+        # 2. Skip internal database/web-server loggers
+        if record.name.startswith((
+            "sqlalchemy", "uvicorn", "watchfiles", "fastapi", 
+            "db", "session", "asyncio", "compile"
+        )):
+            return
+
+        token = in_db_logging.set(True)
+        try:
+            from backend.database.session import SessionLocal
+            from backend.models.models import ActivityLog
+
+            # Normalize Severity Levels
+            level_map = {
+                "DEBUG": "debug",
+                "INFO": "info",
+                "WARNING": "warning",
+                "ERROR": "error",
+                "CRITICAL": "critical"
+            }
+            severity = level_map.get(record.levelname, "info")
+
+            # Normalize Module/Category
+            logger_name = record.name.lower()
+            valid_categories = {
+                "authentication", "security", "research", "dataset", 
+                "experiment", "earth", "radar", "engine", "system", 
+                "api", "database", "errors"
+            }
+
+            module_val = "system"
+            for cat in valid_categories:
+                if cat in logger_name:
+                    module_val = cat
+                    break
+            
+            # Map specific overrides
+            if logger_name.startswith("backend.api"):
+                module_val = "api"
+            elif "auth" in logger_name:
+                module_val = "authentication"
+            elif record.levelname in ("ERROR", "CRITICAL"):
+                module_val = "errors"
+
+            message = record.getMessage()
+
+            # Write event safely
+            db = SessionLocal()
+            log_item = ActivityLog(
+                module=module_val,
+                action="system_event",
+                description=message,
+                severity=severity
+            )
+            db.add(log_item)
+            db.commit()
+            db.close()
+
+        except Exception as err:
+            import sys
+            sys.stderr.write(f"[DatabaseLoggingHandler Exception] {err}\n")
+        finally:
+            in_db_logging.reset(token)
 
 class RequestIDFilter(logging.Filter):
     """
@@ -51,6 +126,11 @@ def setup_logging():
     backend_file_handler.setFormatter(formatter)
     backend_file_handler.addFilter(req_filter)
     root_logger.addHandler(backend_file_handler)
+
+    # Centralized Database Logging Handler
+    db_handler = DatabaseLoggingHandler()
+    db_handler.setLevel(logging.INFO)
+    root_logger.addHandler(db_handler)
 
     # 2. Security Logger Configuration (Specific for auth, logins, overrides)
     security_logger = logging.getLogger("security")

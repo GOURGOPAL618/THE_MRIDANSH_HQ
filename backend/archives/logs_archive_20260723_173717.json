@@ -1,0 +1,130 @@
+[
+  {
+    "id": "8e1d9e69-6e75-4030-8654-1df68be9a0b1",
+    "timestamp": "2026-07-23T17:35:12",
+    "module": "system",
+    "action": "system_event",
+    "description": "Commander 'commander' executed logs archive backup. Archived 15 logs before 2026-07-23T17:36:10.824542+00:00 to logs_archive_20260723_173512.json.",
+    "severity": "info"
+  },
+  {
+    "id": "870a34fb-0a9b-457c-b4e0-3364e2d15d3e",
+    "timestamp": "2026-07-23T17:35:12",
+    "module": "system",
+    "action": "system_event",
+    "description": "POST /api/v1/logs/archive - Status: 200 - Latency: 47.91ms - IP: 127.0.0.1",
+    "severity": "info"
+  },
+  {
+    "id": "4f5ce7e2-c366-4f3f-980d-cebecd119cda",
+    "timestamp": "2026-07-23T17:35:31",
+    "module": "system",
+    "action": "system_event",
+    "description": "GET /health - Status: 200 - Latency: 1.14ms - IP: 127.0.0.1",
+    "severity": "info"
+  },
+  {
+    "id": "8d678cc5-aece-4456-85c5-cf5d48181f2a",
+    "timestamp": "2026-07-23T17:36:30",
+    "module": "system",
+    "action": "system_event",
+    "description": "GET /health - Status: 200 - Latency: 1.16ms - IP: 127.0.0.1",
+    "severity": "info"
+  },
+  {
+    "id": "75639823-ec30-471d-aff2-db90a364168e",
+    "timestamp": "2026-07-23T17:37:06",
+    "module": "security",
+    "action": "system_event",
+    "description": "Authorization failure: Missing authentication token.",
+    "severity": "warning"
+  },
+  {
+    "id": "1a5b8c15-a111-4d3e-b6ec-21cbcc9bfd3b",
+    "timestamp": "2026-07-23T17:37:06",
+    "module": "security",
+    "action": "system_event",
+    "description": "POST /api/v1/logs/retention - Status: 401 - Latency: 25.54ms - IP: 127.0.0.1",
+    "severity": "info"
+  },
+  {
+    "id": "f427b48d-b69c-4470-bc85-b07dea51dd95",
+    "timestamp": "2026-07-23T17:37:08",
+    "module": "security",
+    "action": "system_event",
+    "description": "Authentication success: Commander 'commander' logged in. Session: 6f6e9763-d3a7-4caa-8913-669ddb002d52",
+    "severity": "info"
+  },
+  {
+    "id": "be14f4fb-1544-4fef-be63-e4f87f7ab0de",
+    "timestamp": "2026-07-23T17:37:08",
+    "module": "security",
+    "action": "system_event",
+    "description": "POST /api/v1/auth/login - Status: 200 - Latency: 135.99ms - IP: 127.0.0.1",
+    "severity": "info"
+  },
+  {
+    "id": "c164da6c-8c32-4bdc-925c-c4905f06dc7c",
+    "timestamp": "2026-07-23T17:37:10",
+    "module": "security",
+    "action": "system_event",
+    "description": "Authorization success: Commander 'commander' session '6f6e9763-d3a7-4caa-8913-669ddb002d52' verified.",
+    "severity": "info"
+  },
+  {
+    "id": "71307a4b-6f24-45fa-b703-ddbe89b9d289",
+    "timestamp": "2026-07-23T17:37:10",
+    "module": "system",
+    "action": "system_event",
+    "description": "Commander 'commander' executed logs retention purge. Cleared 0 records older than 30 days.",
+    "severity": "warning"
+  },
+  {
+    "id": "376db14e-2a13-4cf5-940c-157c7b1de3b7",
+    "timestamp": "2026-07-23T17:37:10",
+    "module": "system",
+    "action": "system_event",
+    "description": "POST /api/v1/logs/retention - Status: 200 - Latency: 22.00ms - IP: 127.0.0.1",
+    "severity": "info"
+  },
+  {
+    "id": "1a99ee61-2e5e-42e5-bb5d-f1e87d2700d4",
+    "timestamp": "2026-07-23T17:37:13",
+    "module": "security",
+    "action": "system_event",
+    "description": "Authorization success: Commander 'commander' session '6f6e9763-d3a7-4caa-8913-669ddb002d52' verified.",
+    "severity": "info"
+  },
+  {
+    "id": "827969b2-f2e6-4aad-bbd7-378e08c2cf69",
+    "timestamp": "2026-07-23T17:37:13",
+    "module": "system",
+    "action": "system_event",
+    "description": "GET /api/v1/logs - Status: 200 - Latency: 37.79ms - IP: 127.0.0.1",
+    "severity": "info"
+  },
+  {
+    "id": "c2021797-e5fc-47b6-b8e5-69472e76630c",
+    "timestamp": "2026-07-23T17:37:15",
+    "module": "security",
+    "action": "system_event",
+    "description": "Authorization success: Commander 'commander' session '6f6e9763-d3a7-4caa-8913-669ddb002d52' verified.",
+    "severity": "info"
+  },
+  {
+    "id": "d0305206-ea0c-4ac0-9b5e-b868397a2404",
+    "timestamp": "2026-07-23T17:37:15",
+    "module": "system",
+    "action": "system_event",
+    "description": "POST /api/v1/logs/retention - Status: 422 - Latency: 35.53ms - IP: 127.0.0.1",
+    "severity": "warning"
+  },
+  {
+    "id": "c99a3240-7cd7-4f56-95f0-b5523fcdf475",
+    "timestamp": "2026-07-23T17:37:17",
+    "module": "security",
+    "action": "system_event",
+    "description": "Authorization success: Commander 'commander' session '6f6e9763-d3a7-4caa-8913-669ddb002d52' verified.",
+    "severity": "info"
+  }
+]

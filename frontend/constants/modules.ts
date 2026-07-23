@@ -104,4 +104,12 @@ export const MODULES: ModuleItem[] = [
     description: "Universal search engine across notes, telemetry databases, and files.",
     clearanceLevel: "commander",
   },
+  {
+    id: "integrations",
+    name: "Integrations Vault",
+    path: "/integrations",
+    iconName: "link",
+    description: "External API connections control room and JCC integrations diagnostics.",
+    clearanceLevel: "commander",
+  },
 ];

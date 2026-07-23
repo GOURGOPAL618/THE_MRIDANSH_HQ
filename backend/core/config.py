@@ -31,6 +31,14 @@ class Settings(BaseSettings):
     GOOGLE_API_KEY: Optional[str] = None
     NASA_API_KEY: Optional[str] = None
     MAP_API_KEY: Optional[str] = None
+    OPENWEATHER_API_KEY: Optional[str] = None
+    GITHUB_API_KEY: Optional[str] = None
+
+    # Integration Configuration Options
+    AI_PROVIDER: str = "mock"  # openapi, gemini, mock
+    GITHUB_OWNER: str = "GOURGOPAL618"
+    GITHUB_REPO: str = "THE_MRIDANSH_HQ"
+    GLOBAL_MOCK_MODE: bool = True  # Bypass outbound networks by default in development
 
     # App environment config to read .env
     model_config = SettingsConfigDict(

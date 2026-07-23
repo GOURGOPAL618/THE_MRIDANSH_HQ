@@ -54,6 +54,66 @@ export default function MissionLogsPage() {
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [infoMsg, setInfoMsg] = useState<string | null>(null);
 
+  // Logging Engine Controls States
+  const [retentionDays, setRetentionDays] = useState(30);
+  const [archiveDate, setArchiveDate] = useState(new Date().toISOString().split("T")[0]);
+  const [isPurging, setIsPurging] = useState(false);
+  const [isArchiving, setIsArchiving] = useState(false);
+
+  const handleRetentionPurge = async () => {
+    if (!window.confirm(`Are you sure you want to permanently delete all logs older than ${retentionDays} days? This action is auditable and irreversible.`)) {
+      return;
+    }
+    setIsPurging(true);
+    setErrorMsg(null);
+    setInfoMsg(null);
+    try {
+      const response = await api.post<ApiResponseEnvelope<{ purged_count: number }>>("/api/v1/logs/retention", {
+        days: retentionDays
+      });
+      if (response.data && response.data.success) {
+        setInfoMsg(`Logs retention purge successful: Cleared ${response.data.data.purged_count} old entries.`);
+        await fetchLogs();
+      } else if (response.error) {
+        setErrorMsg(response.error);
+      }
+    } catch {
+      setErrorMsg("Failed to execute logs retention purge operation.");
+    } finally {
+      setIsPurging(false);
+    }
+  };
+
+  const handleExecuteArchive = async () => {
+    if (!archiveDate) {
+      setErrorMsg("Please select a valid archive cutoff date.");
+      return;
+    }
+    if (!window.confirm(`Create a file backup on the server and purge all active database logs dated before ${archiveDate}?`)) {
+      return;
+    }
+    setIsArchiving(true);
+    setErrorMsg(null);
+    setInfoMsg(null);
+    try {
+      const response = await api.post<ApiResponseEnvelope<{ archived_count: number, archive_file: string }>>("/api/v1/logs/archive", {
+        before_date: new Date(archiveDate).toISOString()
+      });
+      if (response.data && response.data.success) {
+        setInfoMsg(
+          `Archive created successfully! File: ${response.data.data.archive_file}. Cleaned ${response.data.data.archived_count} entries from database.`
+        );
+        await fetchLogs();
+      } else if (response.error) {
+        setErrorMsg(response.error);
+      }
+    } catch {
+      setErrorMsg("Failed to execute logs archiving backup operation.");
+    } finally {
+      setIsArchiving(false);
+    }
+  };
+
   // Filters
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedModule, setSelectedModule] = useState("ALL");
@@ -228,6 +288,10 @@ export default function MissionLogsPage() {
         return "text-[#EAB308] border-[#EAB308]/20 bg-[#EAB308]/5";
       case "error":
         return "text-[#EF4444] border-[#EF4444]/20 bg-[#EF4444]/5";
+      case "critical":
+        return "text-red-500 border-red-500/30 bg-red-950/40 text-glow-danger font-bold";
+      case "debug":
+        return "text-gray-400 border-gray-800 bg-gray-900/30";
       case "security":
         return "text-[#D946EF] border-[#D946EF]/20 bg-[#D946EF]/5";
       case "mission":
@@ -237,8 +301,8 @@ export default function MissionLogsPage() {
     }
   };
 
-  const modulesList = ["ALL", "auth", "engine", "radar", "earth", "research", "datasets", "experiments", "system", "logs"];
-  const severitiesList = ["ALL", "info", "warning", "error", "security", "mission"];
+  const modulesList = ["ALL", "authentication", "security", "research", "dataset", "experiment", "earth", "radar", "engine", "system", "api", "database", "errors", "auth", "datasets", "experiments", "logs"];
+  const severitiesList = ["ALL", "info", "debug", "warning", "error", "critical", "security", "mission"];
 
   return (
     <BaseLayout>
@@ -352,6 +416,50 @@ export default function MissionLogsPage() {
                   </button>
                 </div>
 
+              </div>
+            </Panel>
+
+            <Panel title="LOG ENGINE CONTROLS">
+              <div className="space-y-4">
+                {/* Retention Purger */}
+                <div>
+                  <div className="flex justify-between items-center mb-1 text-[10px] text-gray-500 uppercase">
+                    <span>Retention Limit: {retentionDays} Days</span>
+                  </div>
+                  <input
+                    type="range"
+                    min="1"
+                    max="180"
+                    value={retentionDays}
+                    onChange={(e) => setRetentionDays(Number(e.target.value))}
+                    className="w-full accent-primary bg-black/40 h-1 rounded cursor-pointer"
+                  />
+                  <button
+                    onClick={handleRetentionPurge}
+                    className="w-full mt-2 py-1.5 bg-black border border-red-500/40 text-red-400 hover:bg-red-500 hover:text-black transition text-[10px] font-bold uppercase rounded"
+                    disabled={isPurging}
+                  >
+                    {isPurging ? "PURGING..." : "RUN RETENTION PURGE"}
+                  </button>
+                </div>
+
+                {/* Archiving controls */}
+                <div className="border-t border-primary/10 pt-3">
+                  <label className="block text-[10px] text-gray-500 uppercase tracking-wider mb-2">Archive Cutoff Date</label>
+                  <input
+                    type="date"
+                    value={archiveDate}
+                    onChange={(e) => setArchiveDate(e.target.value)}
+                    className="w-full bg-black border border-primary/20 text-gray-300 text-xs px-2 py-1 rounded outline-none"
+                  />
+                  <button
+                    onClick={handleExecuteArchive}
+                    className="w-full mt-2 py-1.5 bg-black border border-primary text-primary hover:bg-primary hover:text-black transition text-[10px] font-bold uppercase rounded"
+                    disabled={isArchiving}
+                  >
+                    {isArchiving ? "ARCHIVING..." : "EXECUTE FILE ARCHIVE"}
+                  </button>
+                </div>
               </div>
             </Panel>
           </div>

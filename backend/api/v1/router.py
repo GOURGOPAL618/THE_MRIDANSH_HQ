@@ -12,6 +12,7 @@ from backend.api.v1.security import router as security_router
 from backend.api.v1.settings import router as settings_router
 from backend.api.v1.notifications import router as notifications_router
 from backend.api.v1.search import router as search_router
+from backend.api.v1.integrations import router as integrations_router
 
 api_router = APIRouter()
 
@@ -29,3 +30,4 @@ api_router.include_router(security_router, prefix="/security", tags=["security"]
 api_router.include_router(settings_router, prefix="/settings", tags=["settings"])
 api_router.include_router(notifications_router, prefix="/notifications", tags=["notifications"])
 api_router.include_router(search_router, prefix="/search", tags=["search"])
+api_router.include_router(integrations_router, prefix="/integrations", tags=["integrations"])

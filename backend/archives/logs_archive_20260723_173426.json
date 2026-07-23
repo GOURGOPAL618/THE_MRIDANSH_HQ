@@ -1,0 +1,506 @@
+[
+  {
+    "id": "749e8d12-5e13-4021-82ba-946ff30d778d",
+    "timestamp": "2026-07-22T14:58:41",
+    "module": "system",
+    "action": "system_check",
+    "description": "Self-diagnostic testing logs sweep.",
+    "severity": "info"
+  },
+  {
+    "id": "c25da018-6c80-4c26-aa5e-5790f78cb7e6",
+    "timestamp": "2026-07-22T14:58:43",
+    "module": "radar",
+    "action": "target_lock",
+    "description": "Target locked at coordinates vector.",
+    "severity": "warning"
+  },
+  {
+    "id": "54e26505-f9d2-4e50-8716-d5e0b152aaed",
+    "timestamp": "2026-07-22T15:03:28",
+    "module": "system",
+    "action": "system_check",
+    "description": "Self-diagnostic testing logs sweep.",
+    "severity": "info"
+  },
+  {
+    "id": "8bc9db4f-387d-44a3-aa7c-8a83bc2675b5",
+    "timestamp": "2026-07-22T15:03:31",
+    "module": "radar",
+    "action": "target_lock",
+    "description": "Target locked at coordinates vector.",
+    "severity": "warning"
+  },
+  {
+    "id": "48556bf5-0792-4e69-b1d4-c2deec3bd836",
+    "timestamp": "2026-07-23T08:00:42",
+    "module": "engine",
+    "action": "ignition",
+    "description": "Engine ignition sequence initiated by Commander 'commander'",
+    "severity": "info"
+  },
+  {
+    "id": "ce37f690-24d3-4e51-80f0-670cbd2b804e",
+    "timestamp": "2026-07-23T08:01:04",
+    "module": "engine",
+    "action": "shutdown",
+    "description": "Engine cooling shutdown initiated by Commander 'commander'",
+    "severity": "info"
+  },
+  {
+    "id": "7f03d7b4-8abd-40a7-b54e-940968c42733",
+    "timestamp": "2026-07-23T14:39:45",
+    "module": "engine",
+    "action": "ignition",
+    "description": "Engine ignition sequence initiated by Commander 'commander'",
+    "severity": "info"
+  },
+  {
+    "id": "a107d11a-0a2d-45d0-9447-7610e0048876",
+    "timestamp": "2026-07-23T14:39:47",
+    "module": "engine",
+    "action": "throttle",
+    "description": "Engine thrust manual throttle adjusted to 20.0% by Commander 'commander'",
+    "severity": "info"
+  },
+  {
+    "id": "e2275304-d8c1-42c0-b443-f90a90c41b1b",
+    "timestamp": "2026-07-23T14:40:22",
+    "module": "engine",
+    "action": "shutdown",
+    "description": "Engine cooling shutdown initiated by Commander 'commander'",
+    "severity": "info"
+  },
+  {
+    "id": "361b6cd3-53b4-4ca6-9d77-5e886e5c025e",
+    "timestamp": "2026-07-23T14:47:15",
+    "module": "engine",
+    "action": "ignition",
+    "description": "Engine ignition sequence initiated by Commander 'commander'",
+    "severity": "info"
+  },
+  {
+    "id": "a32a844e-02e9-4595-bb01-1f2b929fdfbc",
+    "timestamp": "2026-07-23T14:47:20",
+    "module": "engine",
+    "action": "throttle",
+    "description": "Engine thrust manual throttle adjusted to 54.0% by Commander 'commander'",
+    "severity": "info"
+  },
+  {
+    "id": "194ddc16-8b1f-429d-8561-0d56ab47ba97",
+    "timestamp": "2026-07-23T14:47:20",
+    "module": "engine",
+    "action": "throttle",
+    "description": "Engine thrust manual throttle adjusted to 55.0% by Commander 'commander'",
+    "severity": "info"
+  },
+  {
+    "id": "67ac4aaa-4e9f-4151-a9de-8803f2c0f6f9",
+    "timestamp": "2026-07-23T14:47:24",
+    "module": "engine",
+    "action": "shutdown",
+    "description": "Engine cooling shutdown initiated by Commander 'commander'",
+    "severity": "info"
+  },
+  {
+    "id": "179c96bf-b0c0-4b66-a6e5-4213a6bf1650",
+    "timestamp": "2026-07-23T17:26:41",
+    "module": "system",
+    "action": "system_event",
+    "description": "Split logging system successfully initialized.",
+    "severity": "info"
+  },
+  {
+    "id": "987269e1-1418-46bc-b661-33939af422f9",
+    "timestamp": "2026-07-23T17:26:41",
+    "module": "system",
+    "action": "system_event",
+    "description": "Initializing THE MRIDANSH Headquarters JCC backend system...",
+    "severity": "info"
+  },
+  {
+    "id": "dc4cdb4a-1f1d-4303-ab7e-02c3b3676fc9",
+    "timestamp": "2026-07-23T17:26:51",
+    "module": "system",
+    "action": "system_event",
+    "description": "Shutting down THE MRIDANSH Headquarters JCC backend system...",
+    "severity": "info"
+  },
+  {
+    "id": "8ecb1fbe-b76b-475b-88b2-876f7f7fa3be",
+    "timestamp": "2026-07-23T17:26:52",
+    "module": "system",
+    "action": "system_event",
+    "description": "Split logging system successfully initialized.",
+    "severity": "info"
+  },
+  {
+    "id": "4c40eaad-8418-422b-98f3-91300a5e1dbc",
+    "timestamp": "2026-07-23T17:26:52",
+    "module": "system",
+    "action": "system_event",
+    "description": "Initializing THE MRIDANSH Headquarters JCC backend system...",
+    "severity": "info"
+  },
+  {
+    "id": "ea288c47-e82f-4259-a312-3f9a412f96a4",
+    "timestamp": "2026-07-23T17:27:16",
+    "module": "system",
+    "action": "system_event",
+    "description": "GET /api/v1/logs - Status: 200 - Latency: 11.46ms - IP: 127.0.0.1",
+    "severity": "info"
+  },
+  {
+    "id": "8e5dad6a-6588-4577-8b5d-a4931dad95e9",
+    "timestamp": "2026-07-23T17:27:31",
+    "module": "system",
+    "action": "system_event",
+    "description": "GET /health - Status: 200 - Latency: 26.07ms - IP: 127.0.0.1",
+    "severity": "info"
+  },
+  {
+    "id": "4a51df99-a046-4e3f-98b4-b7b850bffc6b",
+    "timestamp": "2026-07-23T17:27:45",
+    "module": "system",
+    "action": "system_event",
+    "description": "Commander 'commander' executed logs retention purge. Cleared 0 records older than 30 days.",
+    "severity": "warning"
+  },
+  {
+    "id": "800c633e-90af-4741-b5e9-df52d4087d8d",
+    "timestamp": "2026-07-23T17:27:45",
+    "module": "system",
+    "action": "system_event",
+    "description": "POST /api/v1/logs/retention - Status: 200 - Latency: 34.38ms - IP: 127.0.0.1",
+    "severity": "info"
+  },
+  {
+    "id": "b35b28c8-9e72-4e12-bbac-e5ab765f5410",
+    "timestamp": "2026-07-23T17:27:48",
+    "module": "system",
+    "action": "system_event",
+    "description": "GET /api/v1/logs - Status: 200 - Latency: 4.95ms - IP: 127.0.0.1",
+    "severity": "info"
+  },
+  {
+    "id": "2586641e-340c-493b-9b87-e5e552b84b96",
+    "timestamp": "2026-07-23T17:28:30",
+    "module": "system",
+    "action": "system_event",
+    "description": "GET /health - Status: 200 - Latency: 0.97ms - IP: 127.0.0.1",
+    "severity": "info"
+  },
+  {
+    "id": "ecaf504d-d504-4e0f-a220-b8dff6345a49",
+    "timestamp": "2026-07-23T17:29:31",
+    "module": "system",
+    "action": "system_event",
+    "description": "GET /health - Status: 200 - Latency: 0.90ms - IP: 127.0.0.1",
+    "severity": "info"
+  },
+  {
+    "id": "91c481a8-ff62-4363-9758-e454ea5f8149",
+    "timestamp": "2026-07-23T17:30:05",
+    "module": "system",
+    "action": "system_event",
+    "description": "Split logging system successfully initialized.",
+    "severity": "info"
+  },
+  {
+    "id": "eb0c3cd4-8245-4c16-b2ba-f3267358d4e1",
+    "timestamp": "2026-07-23T17:30:05",
+    "module": "system",
+    "action": "system_event",
+    "description": "Initializing THE MRIDANSH Headquarters JCC backend system...",
+    "severity": "info"
+  },
+  {
+    "id": "c1564d3f-e3f3-4e17-8503-78ef4494c147",
+    "timestamp": "2026-07-23T17:30:23",
+    "module": "system",
+    "action": "system_event",
+    "description": "Commander 'commander' executed logs retention purge. Cleared 0 records older than 30 days.",
+    "severity": "warning"
+  },
+  {
+    "id": "3afa4fea-0be9-4e2d-84a9-ef104893ad1c",
+    "timestamp": "2026-07-23T17:30:23",
+    "module": "system",
+    "action": "system_event",
+    "description": "POST /api/v1/logs/retention - Status: 200 - Latency: 14.94ms - IP: 127.0.0.1",
+    "severity": "info"
+  },
+  {
+    "id": "679b6b25-26fc-4bcd-9430-32fd6a397160",
+    "timestamp": "2026-07-23T17:30:26",
+    "module": "system",
+    "action": "system_event",
+    "description": "GET /api/v1/logs - Status: 200 - Latency: 5.64ms - IP: 127.0.0.1",
+    "severity": "info"
+  },
+  {
+    "id": "7e29d237-88d0-4671-929d-112a2cb5484a",
+    "timestamp": "2026-07-23T17:30:30",
+    "module": "system",
+    "action": "system_event",
+    "description": "GET /health - Status: 200 - Latency: 0.50ms - IP: 127.0.0.1",
+    "severity": "info"
+  },
+  {
+    "id": "c57aa368-1c82-45c1-9b4c-e256151de65c",
+    "timestamp": "2026-07-23T17:30:51",
+    "module": "system",
+    "action": "system_event",
+    "description": "Shutting down THE MRIDANSH Headquarters JCC backend system...",
+    "severity": "info"
+  },
+  {
+    "id": "32f7fa07-5c07-4625-8af8-abd480e0ea31",
+    "timestamp": "2026-07-23T17:30:52",
+    "module": "system",
+    "action": "system_event",
+    "description": "Split logging system successfully initialized.",
+    "severity": "info"
+  },
+  {
+    "id": "caeaea2f-7583-42ca-8f7a-f67f228678d0",
+    "timestamp": "2026-07-23T17:30:52",
+    "module": "system",
+    "action": "system_event",
+    "description": "Initializing THE MRIDANSH Headquarters JCC backend system...",
+    "severity": "info"
+  },
+  {
+    "id": "5f8a3beb-35ee-4311-9bb2-c729eaa0bd2a",
+    "timestamp": "2026-07-23T17:31:01",
+    "module": "system",
+    "action": "system_event",
+    "description": "Shutting down THE MRIDANSH Headquarters JCC backend system...",
+    "severity": "info"
+  },
+  {
+    "id": "c436c4b3-9347-4450-b817-348728e96206",
+    "timestamp": "2026-07-23T17:31:02",
+    "module": "system",
+    "action": "system_event",
+    "description": "Split logging system successfully initialized.",
+    "severity": "info"
+  },
+  {
+    "id": "da4d95d8-ffaf-4086-ba08-8fda7f975ae0",
+    "timestamp": "2026-07-23T17:31:02",
+    "module": "system",
+    "action": "system_event",
+    "description": "Initializing THE MRIDANSH Headquarters JCC backend system...",
+    "severity": "info"
+  },
+  {
+    "id": "050d3d7c-9211-4fc8-9a53-c11c74000159",
+    "timestamp": "2026-07-23T17:31:31",
+    "module": "system",
+    "action": "system_event",
+    "description": "GET /health - Status: 200 - Latency: 58.02ms - IP: 127.0.0.1",
+    "severity": "info"
+  },
+  {
+    "id": "5e01135d-4abe-493f-b1e7-818b1c725ad3",
+    "timestamp": "2026-07-23T17:31:45",
+    "module": "system",
+    "action": "system_event",
+    "description": "Split logging system successfully initialized.",
+    "severity": "info"
+  },
+  {
+    "id": "059c536e-6ae2-41a9-88c4-6986df9fccb1",
+    "timestamp": "2026-07-23T17:31:45",
+    "module": "system",
+    "action": "system_event",
+    "description": "Initializing THE MRIDANSH Headquarters JCC backend system...",
+    "severity": "info"
+  },
+  {
+    "id": "167216da-88e8-4bd4-b904-cbfe697475f8",
+    "timestamp": "2026-07-23T17:32:30",
+    "module": "system",
+    "action": "system_event",
+    "description": "GET /health - Status: 200 - Latency: 0.59ms - IP: 127.0.0.1",
+    "severity": "info"
+  },
+  {
+    "id": "a0e4818d-cf2c-401f-a680-def32a59a267",
+    "timestamp": "2026-07-23T17:33:29",
+    "module": "security",
+    "action": "system_event",
+    "description": "Authorization failure: Missing authentication token.",
+    "severity": "warning"
+  },
+  {
+    "id": "01732bd3-db75-4b4e-8747-fb0cae0f9546",
+    "timestamp": "2026-07-23T17:33:29",
+    "module": "security",
+    "action": "system_event",
+    "description": "POST /api/v1/logs/retention - Status: 401 - Latency: 24.98ms - IP: 127.0.0.1",
+    "severity": "info"
+  },
+  {
+    "id": "2de40e9c-f3b7-441b-a0a1-bd6eacce047e",
+    "timestamp": "2026-07-23T17:33:31",
+    "module": "security",
+    "action": "system_event",
+    "description": "Authentication success: Commander 'commander' logged in. Session: 2d905deb-f360-4431-8b85-0e0f22e39c53",
+    "severity": "info"
+  },
+  {
+    "id": "63b91f45-7141-4687-be9c-deaf501c2852",
+    "timestamp": "2026-07-23T17:33:31",
+    "module": "security",
+    "action": "system_event",
+    "description": "POST /api/v1/auth/login - Status: 200 - Latency: 189.86ms - IP: 127.0.0.1",
+    "severity": "info"
+  },
+  {
+    "id": "8a79006b-2047-4a60-8559-c9448e09d3d7",
+    "timestamp": "2026-07-23T17:33:31",
+    "module": "system",
+    "action": "system_event",
+    "description": "GET /health - Status: 200 - Latency: 3.51ms - IP: 127.0.0.1",
+    "severity": "info"
+  },
+  {
+    "id": "35d1c17a-4ca4-45f6-ac90-0b7a78bdbc2d",
+    "timestamp": "2026-07-23T17:33:33",
+    "module": "security",
+    "action": "system_event",
+    "description": "Authorization success: Commander 'commander' session '2d905deb-f360-4431-8b85-0e0f22e39c53' verified.",
+    "severity": "info"
+  },
+  {
+    "id": "28445f87-58d7-4758-bd96-41d9d19f4efb",
+    "timestamp": "2026-07-23T17:33:33",
+    "module": "system",
+    "action": "system_event",
+    "description": "Commander 'commander' executed logs retention purge. Cleared 0 records older than 30 days.",
+    "severity": "warning"
+  },
+  {
+    "id": "44ca19fa-1a08-42ac-a6ca-f008a7370951",
+    "timestamp": "2026-07-23T17:33:33",
+    "module": "system",
+    "action": "system_event",
+    "description": "POST /api/v1/logs/retention - Status: 200 - Latency: 52.84ms - IP: 127.0.0.1",
+    "severity": "info"
+  },
+  {
+    "id": "33646bc8-db05-4555-82af-52853cc172ff",
+    "timestamp": "2026-07-23T17:33:35",
+    "module": "security",
+    "action": "system_event",
+    "description": "Authorization success: Commander 'commander' session '2d905deb-f360-4431-8b85-0e0f22e39c53' verified.",
+    "severity": "info"
+  },
+  {
+    "id": "71d2b2dd-513d-4967-a9a2-6d44b5f9c0aa",
+    "timestamp": "2026-07-23T17:33:36",
+    "module": "system",
+    "action": "system_event",
+    "description": "GET /api/v1/logs - Status: 200 - Latency: 49.33ms - IP: 127.0.0.1",
+    "severity": "info"
+  },
+  {
+    "id": "8d405555-9369-472c-939f-f0befd8f5cb8",
+    "timestamp": "2026-07-23T17:34:15",
+    "module": "security",
+    "action": "system_event",
+    "description": "Authorization failure: Missing authentication token.",
+    "severity": "warning"
+  },
+  {
+    "id": "08458a12-8220-4e3f-b9d6-b16eef49ef07",
+    "timestamp": "2026-07-23T17:34:15",
+    "module": "security",
+    "action": "system_event",
+    "description": "POST /api/v1/logs/retention - Status: 401 - Latency: 26.21ms - IP: 127.0.0.1",
+    "severity": "info"
+  },
+  {
+    "id": "3377cf75-2c00-420c-9d48-bfd497f04c96",
+    "timestamp": "2026-07-23T17:34:18",
+    "module": "security",
+    "action": "system_event",
+    "description": "Authentication success: Commander 'commander' logged in. Session: 91bcb7c2-6dee-49c3-936a-67fa63d8a0c5",
+    "severity": "info"
+  },
+  {
+    "id": "ab819f75-aaaa-4a1d-a3cd-2f13b2ea92eb",
+    "timestamp": "2026-07-23T17:34:18",
+    "module": "security",
+    "action": "system_event",
+    "description": "POST /api/v1/auth/login - Status: 200 - Latency: 134.95ms - IP: 127.0.0.1",
+    "severity": "info"
+  },
+  {
+    "id": "5394a335-ff5b-4969-b776-cdf1a9f71b23",
+    "timestamp": "2026-07-23T17:34:20",
+    "module": "security",
+    "action": "system_event",
+    "description": "Authorization success: Commander 'commander' session '91bcb7c2-6dee-49c3-936a-67fa63d8a0c5' verified.",
+    "severity": "info"
+  },
+  {
+    "id": "f3aedc5f-e4a6-4a97-afdf-bd1f6624d5b6",
+    "timestamp": "2026-07-23T17:34:20",
+    "module": "system",
+    "action": "system_event",
+    "description": "Commander 'commander' executed logs retention purge. Cleared 0 records older than 30 days.",
+    "severity": "warning"
+  },
+  {
+    "id": "62bb9841-c1c0-45a2-9b0c-1645daf70f8a",
+    "timestamp": "2026-07-23T17:34:20",
+    "module": "system",
+    "action": "system_event",
+    "description": "POST /api/v1/logs/retention - Status: 200 - Latency: 35.36ms - IP: 127.0.0.1",
+    "severity": "info"
+  },
+  {
+    "id": "5ff9ba2d-485b-4f9e-8414-1675e347024e",
+    "timestamp": "2026-07-23T17:34:22",
+    "module": "security",
+    "action": "system_event",
+    "description": "Authorization success: Commander 'commander' session '91bcb7c2-6dee-49c3-936a-67fa63d8a0c5' verified.",
+    "severity": "info"
+  },
+  {
+    "id": "62ee8f0d-58e5-4678-8c84-b7226e80378b",
+    "timestamp": "2026-07-23T17:34:22",
+    "module": "system",
+    "action": "system_event",
+    "description": "GET /api/v1/logs - Status: 200 - Latency: 21.48ms - IP: 127.0.0.1",
+    "severity": "info"
+  },
+  {
+    "id": "9c84d468-e313-414b-aac9-2a866900e465",
+    "timestamp": "2026-07-23T17:34:24",
+    "module": "security",
+    "action": "system_event",
+    "description": "Authorization success: Commander 'commander' session '91bcb7c2-6dee-49c3-936a-67fa63d8a0c5' verified.",
+    "severity": "info"
+  },
+  {
+    "id": "9883bc97-6c4f-4e2f-bbe3-47bd9a7d66cb",
+    "timestamp": "2026-07-23T17:34:24",
+    "module": "system",
+    "action": "system_event",
+    "description": "POST /api/v1/logs/retention - Status: 422 - Latency: 30.27ms - IP: 127.0.0.1",
+    "severity": "warning"
+  },
+  {
+    "id": "31c3c1c0-cdf8-48a9-881a-fbed4795ebcf",
+    "timestamp": "2026-07-23T17:34:26",
+    "module": "security",
+    "action": "system_event",
+    "description": "Authorization success: Commander 'commander' session '91bcb7c2-6dee-49c3-936a-67fa63d8a0c5' verified.",
+    "severity": "info"
+  }
+]

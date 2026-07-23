@@ -38,6 +38,20 @@ app.include_router(api_router, prefix=settings.API_V1_STR)
 
 @app.on_event("startup")
 async def startup_event():
+    import logging
+    from backend.core.logging_config import DatabaseLoggingHandler, security_logger
+    
+    root_logger = logging.getLogger()
+    if not any(isinstance(h, DatabaseLoggingHandler) for h in root_logger.handlers):
+        db_handler = DatabaseLoggingHandler()
+        db_handler.setLevel(logging.INFO)
+        root_logger.addHandler(db_handler)
+        
+    if not any(isinstance(h, DatabaseLoggingHandler) for h in security_logger.handlers):
+        sec_db_handler = DatabaseLoggingHandler()
+        sec_db_handler.setLevel(logging.INFO)
+        security_logger.addHandler(sec_db_handler)
+
     system_logger.info("Initializing THE MRIDANSH Headquarters JCC backend system...")
     
     # Auto-seed the Single Commander record if missing
