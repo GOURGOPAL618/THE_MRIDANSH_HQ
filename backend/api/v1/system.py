@@ -86,7 +86,7 @@ async def system_dashboard(
         merged_activity.append({
             "timestamp": l.timestamp.isoformat(),
             "event": f"{l.module.upper()} ACTIVITY",
-            "details": l.message,
+            "details": l.description,
             "risk_level": "low",
             "success": True
         })

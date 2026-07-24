@@ -6,6 +6,7 @@ import BaseLayout from "../../layouts/BaseLayout";
 import Panel from "../../components/Panel";
 import { api } from "../../services/api";
 import { useAudio } from "../../hooks/useAudio";
+import { PageLoader } from "../../components/loading";
 
 interface SearchResultItem {
   id: string;
@@ -441,9 +442,7 @@ function SearchCenterContent() {
               {/* scrollable results grid container */}
               <div className="space-y-3 h-[460px] overflow-y-auto pr-1">
                 {isLoading ? (
-                  <div className="text-center py-20 text-primary animate-pulse text-xs uppercase tracking-widest">
-                    Consolidating search database indexes...
-                  </div>
+                  <PageLoader message="Consolidating search database indexes..." />
                 ) : results.length === 0 ? (
                   <div className="text-center py-20 text-gray-600 italic">
                     {query.trim() ? "NO SEARCH RESULTS MATCHED ACTIVE CONFIGS." : "ENTER SEARCH PARAMETERS TO INITIALIZE."}

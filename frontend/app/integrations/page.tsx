@@ -5,6 +5,7 @@ import BaseLayout from "../../layouts/BaseLayout";
 import Panel from "../../components/Panel";
 import { api } from "../../services/api";
 import { useAudio } from "../../hooks/useAudio";
+import { PageLoader, ButtonSpinner } from "../../components/loading";
 
 interface ProviderStatus {
   status: string;
@@ -274,9 +275,7 @@ export default function IntegrationsPage() {
         {/* CONNECTION STATUSES GRID */}
         <Panel title="EXTERNAL API CONNECTIONS DIAGNOSTIC VAULT">
           {isLoadingStatus && !statusData ? (
-            <div className="text-center py-6 text-primary animate-pulse text-xs uppercase tracking-widest">
-              Syncing connections status...
-            </div>
+            <PageLoader message="Syncing connections status..." />
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
               {statusData && Object.entries(statusData.providers).map(([key, provider]) => (
@@ -337,10 +336,11 @@ export default function IntegrationsPage() {
                   <span>JCC HQ Coordinate weather telemetry (21.03, 80.24)</span>
                   <button
                     onClick={syncWeather}
-                    className="py-1 px-3 bg-black border border-primary/40 text-primary text-[10px] uppercase font-bold rounded hover:bg-primary hover:text-black transition"
+                    className="py-1 px-3 bg-black border border-primary/40 text-primary text-[10px] uppercase font-bold rounded hover:bg-primary hover:text-black transition flex items-center space-x-1.5"
                     disabled={isLoadingWeather}
                   >
-                    {isLoadingWeather ? "SYNCING..." : "SYNC WEATHER"}
+                    {isLoadingWeather && <ButtonSpinner />}
+                    <span>{isLoadingWeather ? "SYNCING..." : "SYNC WEATHER"}</span>
                   </button>
                 </div>
 
@@ -390,10 +390,11 @@ export default function IntegrationsPage() {
                   <span>NASA APOD Telescope images catalog telemetry</span>
                   <button
                     onClick={syncNasaApod}
-                    className="py-1 px-3 bg-black border border-primary/40 text-primary text-[10px] uppercase font-bold rounded hover:bg-primary hover:text-black transition"
+                    className="py-1 px-3 bg-black border border-primary/40 text-primary text-[10px] uppercase font-bold rounded hover:bg-primary hover:text-black transition flex items-center space-x-1.5"
                     disabled={isLoadingNasa}
                   >
-                    {isLoadingNasa ? "SYNCING..." : "SYNC NASA APOD"}
+                    {isLoadingNasa && <ButtonSpinner />}
+                    <span>{isLoadingNasa ? "SYNCING..." : "SYNC NASA APOD"}</span>
                   </button>
                 </div>
 
@@ -466,10 +467,11 @@ export default function IntegrationsPage() {
                   />
                   <button
                     type="submit"
-                    className="py-1 px-4 bg-primary text-black text-xs font-bold uppercase rounded hover:bg-primary/95 transition active:scale-95 shrink-0"
+                    className="py-1 px-4 bg-primary text-black text-xs font-bold uppercase rounded hover:bg-primary/95 transition active:scale-95 shrink-0 flex items-center space-x-1.5"
                     disabled={isLoadingAI}
                   >
-                    {isLoadingAI ? "QUERYING..." : "SUBMIT"}
+                    {isLoadingAI && <ButtonSpinner className="text-black" />}
+                    <span>{isLoadingAI ? "QUERYING..." : "SUBMIT"}</span>
                   </button>
                 </form>
               </div>
@@ -482,10 +484,11 @@ export default function IntegrationsPage() {
                   <span>Git commits telemetry for owner GOURGOPAL618</span>
                   <button
                     onClick={syncGitHub}
-                    className="py-1 px-3 bg-black border border-primary/40 text-primary text-[10px] uppercase font-bold rounded hover:bg-primary hover:text-black transition"
+                    className="py-1 px-3 bg-black border border-primary/40 text-primary text-[10px] uppercase font-bold rounded hover:bg-primary hover:text-black transition flex items-center space-x-1.5"
                     disabled={isLoadingGit}
                   >
-                    {isLoadingGit ? "SYNCING..." : "SYNC COMMIT LOGS"}
+                    {isLoadingGit && <ButtonSpinner />}
+                    <span>{isLoadingGit ? "SYNCING..." : "SYNC COMMIT LOGS"}</span>
                   </button>
                 </div>
 

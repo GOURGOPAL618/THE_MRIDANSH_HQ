@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import BaseLayout from "../../layouts/BaseLayout";
 import Panel from "../../components/Panel";
 import { api } from "../../services/api";
+import { CardSkeleton } from "../../components/loading";
 
 interface DatasetNote {
   id: string;
@@ -334,8 +335,10 @@ export default function DatasetVaultPage() {
 
               <div className="space-y-3 max-h-[550px] overflow-y-auto pr-1">
                 {isLoading && datasets.length === 0 ? (
-                  <div className="text-center text-xs text-primary animate-pulse py-8 uppercase tracking-widest">
-                    SYNCING METADATA DIRECTORY...
+                  <div className="space-y-3">
+                    <CardSkeleton rows={3} />
+                    <CardSkeleton rows={3} />
+                    <CardSkeleton rows={3} />
                   </div>
                 ) : datasets.length === 0 ? (
                   <div className="text-center py-12 text-xs text-gray-600 italic border border-dashed border-gray-800 rounded">

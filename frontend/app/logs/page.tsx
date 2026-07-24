@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef } from "react";
 import BaseLayout from "../../layouts/BaseLayout";
 import Panel from "../../components/Panel";
 import { api } from "../../services/api";
+import { TableSkeleton } from "../../components/loading";
 
 interface LogItem {
   id: string;
@@ -484,9 +485,7 @@ export default function MissionLogsPage() {
               <div className="bg-black/90 border border-primary/15 rounded p-3 h-[450px] overflow-y-auto font-mono text-[11px] leading-relaxed space-y-2 selection:bg-primary selection:text-black scrollbar-thin scrollbar-thumb-primary/20 scrollbar-track-transparent">
                 
                 {isLoading && logs.length === 0 ? (
-                  <div className="text-center text-primary animate-pulse py-20 uppercase tracking-widest text-xs">
-                    ESTABLISHING CONNECTION TO AUDIT FEED...
-                  </div>
+                  <TableSkeleton rows={8} columns={4} />
                 ) : logs.length === 0 ? (
                   <div className="text-center py-20 text-gray-600 italic">
                     NO LOG ENTRIES MATCHING ACTIVE FILTERS DETECTED.
