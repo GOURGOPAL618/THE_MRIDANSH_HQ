@@ -6,7 +6,7 @@ from starlette.exceptions import HTTPException as StarletteHTTPException
 
 # Import config, split logging system, response helpers and routers
 from backend.core.config import settings
-from backend.core.logging_config import system_logger, security_logger
+from backend.core.logging_config import system_logger, security_logger, request_id_var
 from backend.middleware.request_id import RequestIDMiddleware
 from backend.middleware.telemetry import TelemetryMiddleware
 from backend.schemas.responses import ApiResponse, make_response
@@ -129,37 +129,118 @@ async def root():
     )
 
 # Standardized Global Exception Handlers mapping success=False response schema
+from backend.core.exceptions import AetherException
+import sqlalchemy.exc
+
+@app.exception_handler(AetherException)
+async def aether_exception_handler(request: Request, exc: AetherException):
+    # Log developer-facing trace details to Task 19 logger
+    system_logger.error(
+        f"[AETHER_EXCEPTION] Code: {exc.error_code} - Msg: {exc.message} - Details: {exc.details}"
+    )
+    return JSONResponse(
+        status_code=exc.status_code,
+        content=make_response(
+            success=False,
+            message=exc.message,
+            data={
+                "error_code": exc.error_code,
+                "request_id": request_id_var.get()
+            }
+        )
+    )
+
+@app.exception_handler(sqlalchemy.exc.SQLAlchemyError)
+async def database_exception_handler(request: Request, exc: sqlalchemy.exc.SQLAlchemyError):
+    # Extract developer-facing database details
+    err_msg = str(exc)
+    
+    # Check for UNIQUE constraint or integrity error
+    if isinstance(exc, sqlalchemy.exc.IntegrityError):
+        system_logger.error(f"[DB_INTEGRITY_CONFLICT] {err_msg}")
+        return JSONResponse(
+            status_code=status.HTTP_409_CONFLICT,
+            content=make_response(
+                success=False,
+                message="Resource state conflict. A record with matching unique parameters already exists.",
+                data={
+                    "error_code": "DATABASE_CONFLICT",
+                    "request_id": request_id_var.get()
+                }
+            )
+        )
+        
+    system_logger.error(f"[DB_TRANSACTION_FAILURE] {err_msg}")
+    return JSONResponse(
+        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        content=make_response(
+            success=False,
+            message="Database transaction processing failed.",
+            data={
+                "error_code": "DATABASE_ERROR",
+                "request_id": request_id_var.get()
+            }
+        )
+    )
+
+@app.exception_handler(OSError)
+async def filesystem_exception_handler(request: Request, exc: OSError):
+    system_logger.error(f"[FILESYSTEM_FAILURE] {str(exc)}")
+    return JSONResponse(
+        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        content=make_response(
+            success=False,
+            message="Filesystem storage access failure.",
+            data={
+                "error_code": "FILESYSTEM_ERROR",
+                "request_id": request_id_var.get()
+            }
+        )
+    )
+
 @app.exception_handler(StarletteHTTPException)
 async def http_exception_handler(request: Request, exc: StarletteHTTPException):
+    system_logger.error(f"[HTTP_EXCEPTION] Status: {exc.status_code} - Msg: {exc.detail}")
     return JSONResponse(
         status_code=exc.status_code,
         content=make_response(
             success=False,
             message=exc.detail,
-            data=None
+            data={
+                "error_code": "HTTP_ERROR",
+                "request_id": request_id_var.get()
+            }
         )
     )
 
 @app.exception_handler(RequestValidationError)
 async def validation_exception_handler(request: Request, exc: RequestValidationError):
+    system_logger.warning(f"[VALIDATION_EXCEPTION] Params validation failed: {str(exc.errors())}")
     return JSONResponse(
         status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
         content=make_response(
             success=False,
             message="Request parameters validation failed.",
-            data={"errors": exc.errors()}
+            data={
+                "error_code": "VALIDATION_ERROR",
+                "errors": exc.errors(),
+                "request_id": request_id_var.get()
+            }
         )
     )
 
 @app.exception_handler(Exception)
 async def general_exception_handler(request: Request, exc: Exception):
-    system_logger.error(f"CRITICAL: Unhandled server exception: {str(exc)}", exc_info=True)
+    system_logger.critical(f"CRITICAL: Unhandled server exception: {str(exc)}", exc_info=True)
     return JSONResponse(
         status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
         content=make_response(
             success=False,
             message="Internal server processing error.",
-            data=None
+            data={
+                "error_code": "UNKNOWN_ERROR",
+                "request_id": request_id_var.get()
+            }
         )
     )
 
