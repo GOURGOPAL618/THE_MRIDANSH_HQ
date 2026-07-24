@@ -216,6 +216,15 @@ async def http_exception_handler(request: Request, exc: StarletteHTTPException):
 @app.exception_handler(RequestValidationError)
 async def validation_exception_handler(request: Request, exc: RequestValidationError):
     system_logger.warning(f"[VALIDATION_EXCEPTION] Params validation failed: {str(exc.errors())}")
+    
+    # Sanitize ctx dict in errors to ensure JSON serialization compatibility
+    sanitized_errors = []
+    for err in exc.errors():
+        s_err = dict(err)
+        if "ctx" in s_err and isinstance(s_err["ctx"], dict):
+            s_err["ctx"] = {k: str(v) for k, v in s_err["ctx"].items()}
+        sanitized_errors.append(s_err)
+
     return JSONResponse(
         status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
         content=make_response(
@@ -223,7 +232,7 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
             message="Request parameters validation failed.",
             data={
                 "error_code": "VALIDATION_ERROR",
-                "errors": exc.errors(),
+                "errors": sanitized_errors,
                 "request_id": request_id_var.get()
             }
         )

@@ -6,11 +6,29 @@
   :root {
     --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     --font-mono: 'JetBrains Mono', Consolas, Monaco, "Courier New", Courier, monospace;
+
+    /* Theme System Default Variables */
+    --color-background: #05070B;
+    --color-panel: #0E1525;
+    --color-primary: #0072FF;
+    --color-primary-glow: rgba(0, 114, 255, 0.5);
+    --color-secondary: #00FFFF;
+    --color-success: #10B981;
+    --color-warning: #F59E0B;
+    --color-danger: #EF4444;
+
+    --panel-opacity: 0.85;
+    --glow-intensity: 1.0;
+    --border-radius: 4px;
+    --font-size: 14px;
+    --animation-speed-scale: 1.0;
+    --animation-play-state: running;
   }
 
   body {
     @apply bg-background text-white font-sans overflow-x-hidden;
-    background-color: #05070B;
+    background-color: var(--color-background);
+    font-size: var(--font-size);
   }
 
   /* Custom Scrollbar for Mission Control Style */
@@ -19,47 +37,49 @@
     height: 6px;
   }
   ::-webkit-scrollbar-track {
-    background: #05070B;
+    background: var(--color-background);
   }
   ::-webkit-scrollbar-thumb {
-    background: #0E1525;
-    border-radius: 3px;
+    background: var(--color-panel);
+    border-radius: var(--border-radius);
   }
   ::-webkit-scrollbar-thumb:hover {
-    background: #0072FF;
+    background: var(--color-primary);
   }
 }
 
 @layer utilities {
   .text-glow {
-    text-shadow: 0 0 10px rgba(0, 114, 255, 0.6);
+    text-shadow: 0 0 calc(10px * var(--glow-intensity)) var(--color-primary-glow);
   }
   .text-cyan-glow {
-    text-shadow: 0 0 10px rgba(0, 255, 255, 0.6);
+    text-shadow: 0 0 calc(10px * var(--glow-intensity)) var(--color-primary-glow);
   }
   .text-red-glow {
-    text-shadow: 0 0 10px rgba(239, 68, 68, 0.6);
+    text-shadow: 0 0 calc(10px * var(--glow-intensity)) rgba(239, 68, 68, 0.6);
   }
   .text-green-glow {
-    text-shadow: 0 0 10px rgba(16, 185, 129, 0.6);
+    text-shadow: 0 0 calc(10px * var(--glow-intensity)) rgba(16, 185, 129, 0.6);
   }
   .border-glow {
-    box-shadow: 0 0 10px rgba(0, 114, 255, 0.3);
+    box-shadow: 0 0 calc(10px * var(--glow-intensity)) var(--color-primary-glow);
   }
   .border-cyan-glow {
-    box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+    box-shadow: 0 0 calc(10px * var(--glow-intensity)) var(--color-primary-glow);
   }
 
   /* Futuristic Glassmorphic Panel Styles */
   .panel-glass {
-    background: rgba(14, 21, 37, 0.85);
+    background: color-mix(in srgb, var(--color-panel) calc(var(--panel-opacity) * 100%), transparent);
     backdrop-filter: blur(10px);
-    border: 1px solid rgba(0, 114, 255, 0.15);
+    border: 1px solid color-mix(in srgb, var(--color-primary) 15%, transparent);
+    border-radius: var(--border-radius);
   }
   .panel-glass-secondary {
-    background: rgba(5, 7, 11, 0.7);
+    background: color-mix(in srgb, var(--color-background) calc(var(--panel-opacity) * 100%), transparent);
     backdrop-filter: blur(8px);
-    border: 1px solid rgba(0, 255, 255, 0.1);
+    border: 1px solid color-mix(in srgb, var(--color-secondary) 10%, transparent);
+    border-radius: var(--border-radius);
   }
 
   /* Scanline sweep effect */
@@ -146,13 +166,16 @@
 
 /* Tailwind utility mappings for animations */
 .animate-radar-sweep {
-  animation: radar-sweep-ani 4s linear infinite;
+  animation: radar-sweep-ani calc(4s / var(--animation-speed-scale, 1.0)) linear infinite;
+  animation-play-state: var(--animation-play-state, running);
 }
 
 .animate-core-pulse {
-  animation: core-pulse-ani 3s ease-in-out infinite;
+  animation: core-pulse-ani calc(3s / var(--animation-speed-scale, 1.0)) ease-in-out infinite;
+  animation-play-state: var(--animation-play-state, running);
 }
 
 .animate-warning-flash {
-  animation: warning-flash-ani 1.5s infinite;
+  animation: warning-flash-ani calc(1.5s / var(--animation-speed-scale, 1.0)) infinite;
+  animation-play-state: var(--animation-play-state, running);
 }

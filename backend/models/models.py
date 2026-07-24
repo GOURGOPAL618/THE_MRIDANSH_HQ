@@ -52,6 +52,14 @@ class Settings(Base):
     notifications_enabled: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
     performance_mode: Mapped[str] = mapped_column(String(20), default="quality", nullable=False)  # quality, performance
 
+    # Visual Theme Override Columns
+    accent_color: Mapped[Optional[str]] = mapped_column(String(30), default=None, nullable=True)
+    panel_opacity: Mapped[float] = mapped_column(Float, default=0.85, nullable=False)
+    glow_intensity: Mapped[float] = mapped_column(Float, default=1.0, nullable=False)
+    animation_speed: Mapped[float] = mapped_column(Float, default=1.0, nullable=False)
+    border_radius: Mapped[str] = mapped_column(String(20), default="4px", nullable=False)
+    font_size: Mapped[str] = mapped_column(String(20), default="14px", nullable=False)
+
     # Relationships
     commander: Mapped["Commander"] = relationship("Commander", back_populates="settings")
 

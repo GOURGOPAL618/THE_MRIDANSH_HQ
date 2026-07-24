@@ -9,27 +9,27 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        background: "#05070B",
-        panel: "#0E1525",
+        background: "var(--color-background)",
+        panel: "var(--color-panel)",
         primary: {
-          DEFAULT: "#0072FF",
-          glow: "#00d2ff",
+          DEFAULT: "var(--color-primary)",
+          glow: "var(--color-primary-glow)",
         },
         secondary: {
-          DEFAULT: "#00FFFF",
+          DEFAULT: "var(--color-secondary)",
         },
-        success: "#10B981",
-        warning: "#F59E0B",
-        danger: "#EF4444",
+        success: "var(--color-success)",
+        warning: "var(--color-warning)",
+        danger: "var(--color-danger)",
       },
       fontFamily: {
         sans: ["var(--font-sans)", "Inter", "sans-serif"],
         mono: ["var(--font-mono)", "JetBrains Mono", "monospace"],
       },
       boxShadow: {
-        glow: "0 0 15px rgba(0, 114, 255, 0.5)",
-        "cyan-glow": "0 0 15px rgba(0, 255, 255, 0.5)",
-        "red-glow": "0 0 15px rgba(239, 68, 68, 0.5)",
+        glow: "0 0 calc(15px * var(--glow-intensity)) var(--color-primary-glow)",
+        "cyan-glow": "0 0 calc(15px * var(--glow-intensity)) var(--color-primary-glow)",
+        "red-glow": "0 0 calc(15px * var(--glow-intensity)) rgba(239, 68, 68, 0.5)",
       },
     },
   },

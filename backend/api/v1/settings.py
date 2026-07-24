@@ -53,7 +53,14 @@ async def get_commander_settings(
             "volume": settings_record.volume,
             "is_muted": settings_record.is_muted,
             "notifications_enabled": settings_record.notifications_enabled,
-            "performance_mode": settings_record.performance_mode
+            "performance_mode": settings_record.performance_mode,
+            # Visual theme overrides
+            "accent_color": settings_record.accent_color,
+            "panel_opacity": settings_record.panel_opacity,
+            "glow_intensity": settings_record.glow_intensity,
+            "animation_speed": settings_record.animation_speed,
+            "border_radius": settings_record.border_radius,
+            "font_size": settings_record.font_size
         }
     )
 
@@ -97,7 +104,7 @@ async def update_commander_settings(
         settings_record.volume = payload.volume
         
     if payload.theme is not None:
-        allowed_themes = {"default", "arctic", "midnight", "deepspace"}
+        allowed_themes = {"default", "arctic", "midnight", "deepspace", "solar", "engineering", "minimal"}
         if payload.theme not in allowed_themes:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
@@ -119,6 +126,20 @@ async def update_commander_settings(
         
     if payload.notifications_enabled is not None:
         settings_record.notifications_enabled = payload.notifications_enabled
+
+    # Visual Theme Overrides PUT mappings
+    if payload.accent_color is not None or "accent_color" in payload.model_fields_set:
+        settings_record.accent_color = payload.accent_color
+    if payload.panel_opacity is not None:
+        settings_record.panel_opacity = payload.panel_opacity
+    if payload.glow_intensity is not None:
+        settings_record.glow_intensity = payload.glow_intensity
+    if payload.animation_speed is not None:
+        settings_record.animation_speed = payload.animation_speed
+    if payload.border_radius is not None:
+        settings_record.border_radius = payload.border_radius
+    if payload.font_size is not None:
+        settings_record.font_size = payload.font_size
         
     db.commit()
     db.refresh(settings_record)
@@ -133,6 +154,13 @@ async def update_commander_settings(
             "volume": settings_record.volume,
             "is_muted": settings_record.is_muted,
             "notifications_enabled": settings_record.notifications_enabled,
-            "performance_mode": settings_record.performance_mode
+            "performance_mode": settings_record.performance_mode,
+            # Visual theme overrides
+            "accent_color": settings_record.accent_color,
+            "panel_opacity": settings_record.panel_opacity,
+            "glow_intensity": settings_record.glow_intensity,
+            "animation_speed": settings_record.animation_speed,
+            "border_radius": settings_record.border_radius,
+            "font_size": settings_record.font_size
         }
     )

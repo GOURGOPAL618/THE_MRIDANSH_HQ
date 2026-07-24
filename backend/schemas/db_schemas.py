@@ -51,12 +51,46 @@ class SessionOut(SessionBase):
 
 
 # --- SETTINGS SCHEMAS ---
+from pydantic import field_validator
+import re
+
 class SettingsBase(BaseModel):
     theme: str = "default"
     volume: float = Field(0.5, ge=0.0, le=1.0)
     is_muted: bool = False
     notifications_enabled: bool = True
     performance_mode: str = "quality"
+    
+    # Visual Theme Override Columns
+    accent_color: Optional[str] = Field(None, description="Accent color hex or keyword override")
+    panel_opacity: float = Field(0.85, ge=0.0, le=1.0)
+    glow_intensity: float = Field(1.0, ge=0.0, le=2.0)
+    animation_speed: float = Field(1.0, ge=0.0, le=3.0)
+    border_radius: str = Field("4px", min_length=1, max_length=20)
+    font_size: str = Field("14px", min_length=1, max_length=20)
+
+    @field_validator("border_radius")
+    @classmethod
+    def validate_border_radius(cls, v: str) -> str:
+        if not re.match(r"^\d+(\.\d+)?(px|rem|em|%)?$|^0$", v):
+            raise ValueError("Invalid border_radius unit style. Must be a valid CSS value like '4px', '0.5rem', or '0'.")
+        return v
+
+    @field_validator("font_size")
+    @classmethod
+    def validate_font_size(cls, v: str) -> str:
+        if not re.match(r"^\d+(\.\d+)?(px|rem|em|%)?$", v):
+            raise ValueError("Invalid font_size unit style. Must be a valid CSS value like '12px' or '1rem'.")
+        return v
+
+    @field_validator("accent_color")
+    @classmethod
+    def validate_accent_color(cls, v: Optional[str]) -> Optional[str]:
+        if v is not None:
+            if not re.match(r"^#[0-9a-fA-F]{3,6}$|^[a-zA-Z]+$", v):
+                raise ValueError("Invalid accent_color. Must be a valid CSS color name or a standard hex color code like '#00FFFF'.")
+        return v
+
 
 class SettingsUpdate(BaseModel):
     theme: Optional[str] = None
@@ -64,6 +98,39 @@ class SettingsUpdate(BaseModel):
     is_muted: Optional[bool] = None
     notifications_enabled: Optional[bool] = None
     performance_mode: Optional[str] = None
+    
+    # Visual Theme Override Columns
+    accent_color: Optional[str] = None
+    panel_opacity: Optional[float] = Field(None, ge=0.0, le=1.0)
+    glow_intensity: Optional[float] = Field(None, ge=0.0, le=2.0)
+    animation_speed: Optional[float] = Field(None, ge=0.0, le=3.0)
+    border_radius: Optional[str] = None
+    font_size: Optional[str] = None
+
+    @field_validator("border_radius")
+    @classmethod
+    def validate_border_radius_opt(cls, v: Optional[str]) -> Optional[str]:
+        if v is not None:
+            if not re.match(r"^\d+(\.\d+)?(px|rem|em|%)?$|^0$", v):
+                raise ValueError("Invalid border_radius unit style. Must be a valid CSS value like '4px', '0.5rem', or '0'.")
+        return v
+
+    @field_validator("font_size")
+    @classmethod
+    def validate_font_size_opt(cls, v: Optional[str]) -> Optional[str]:
+        if v is not None:
+            if not re.match(r"^\d+(\.\d+)?(px|rem|em|%)?$", v):
+                raise ValueError("Invalid font_size unit style. Must be a valid CSS value like '12px' or '1rem'.")
+        return v
+
+    @field_validator("accent_color")
+    @classmethod
+    def validate_accent_color_opt(cls, v: Optional[str]) -> Optional[str]:
+        if v is not None:
+            if not re.match(r"^#[0-9a-fA-F]{3,6}$|^[a-zA-Z]+$", v):
+                raise ValueError("Invalid accent_color. Must be a valid CSS color name or a standard hex color code like '#00FFFF'.")
+        return v
+
 
 class SettingsOut(SettingsBase):
     id: uuid.UUID
