@@ -59,12 +59,12 @@ export default function DashboardPage() {
   const fetchDashboardData = useCallback(async (silent = false, signal?: AbortSignal) => {
     if (!silent) setIsLoading(true);
     try {
-      const response = await api.get<DashboardData>("/api/v1/system/dashboard", undefined, { signal });
+      const response = await api.get<{ data: DashboardData }>("/api/v1/system/dashboard", undefined, { signal });
       if (response.error) {
         if (signal?.aborted) return;
         setError(response.error);
-      } else if (response.data) {
-        const freshData = response.data;
+      } else if (response.data && response.data.data) {
+        const freshData = response.data.data;
         setData((prev) => {
           if (!prev) return freshData;
           
