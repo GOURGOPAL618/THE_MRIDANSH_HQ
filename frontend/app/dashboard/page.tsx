@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import BaseLayout from "../../layouts/BaseLayout";
 import Panel from "../../components/Panel";
 import Button from "../../components/Button";
@@ -56,7 +56,7 @@ export default function DashboardPage() {
   const [error, setError] = useState<string | null>(null);
 
   // Fetch Dashboard summary helper
-  const fetchDashboardData = async (silent = false, signal?: AbortSignal) => {
+  const fetchDashboardData = useCallback(async (silent = false, signal?: AbortSignal) => {
     if (!silent) setIsLoading(true);
     try {
       const response = await api.get<DashboardData>("/api/v1/system/dashboard", undefined, { signal });
@@ -64,7 +64,24 @@ export default function DashboardPage() {
         if (signal?.aborted) return;
         setError(response.error);
       } else if (response.data) {
-        setData(response.data);
+        const freshData = response.data;
+        setData((prev) => {
+          if (!prev) return freshData;
+          
+          const hasMaterialChange =
+            prev.system_status.api_status !== freshData.system_status.api_status ||
+            prev.system_status.db_status !== freshData.system_status.db_status ||
+            prev.system_status.active_sessions !== freshData.system_status.active_sessions ||
+            prev.system_status.total_sessions !== freshData.system_status.total_sessions ||
+            JSON.stringify(prev.mission_stats) !== JSON.stringify(freshData.mission_stats) ||
+            JSON.stringify(prev.module_status) !== JSON.stringify(freshData.module_status) ||
+            JSON.stringify(prev.recent_activity) !== JSON.stringify(freshData.recent_activity);
+
+          if (!hasMaterialChange && prev.system_status.uptime === freshData.system_status.uptime) {
+            return prev;
+          }
+          return freshData;
+        });
         setError(null);
       }
     } catch (err: unknown) {
@@ -74,7 +91,7 @@ export default function DashboardPage() {
     } finally {
       if (!silent && !signal?.aborted) setIsLoading(false);
     }
-  };
+  }, []);
 
   // Setup mount fetch and periodic telemetry polling updates with abort capabilities
   useEffect(() => {
@@ -120,25 +137,25 @@ export default function DashboardPage() {
       stopPolling();
       document.removeEventListener("visibilitychange", handleVisibilityChange);
     };
-  }, []);
+  }, [fetchDashboardData]);
 
-  const formatUptime = (seconds: number) => {
+  const formatUptime = useCallback((seconds: number) => {
     const hrs = Math.floor(seconds / 3600);
     const mins = Math.floor((seconds % 3600) / 60);
     const secs = Math.floor(seconds % 60);
     return `${hrs}h ${mins}m ${secs}s`;
-  };
+  }, []);
 
-  const handleDiagnosticScan = () => {
+  const handleDiagnosticScan = useCallback(() => {
     notifyInfo("Initiating diagnostic sweeps across all quantum nodes...", "SYSTEM DIAGNOSTIC");
     setTimeout(() => {
       notifySuccess("All JCC nodes responding. Telemetry state nominal.", "DIAGNOSTIC COMPLETE");
     }, 2000);
-  };
+  }, [notifyInfo, notifySuccess]);
 
-  const handleLockdownMode = () => {
+  const handleLockdownMode = useCallback(() => {
     notifyError("Cockpit override detected. Lockdown switches armed.", "CRITICAL WARNING");
-  };
+  }, [notifyError]);
 
   if (isLoading) {
     return (

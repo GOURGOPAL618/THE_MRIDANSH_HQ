@@ -3,8 +3,17 @@
 import React, { useState, useEffect, useRef } from "react";
 import BaseLayout from "../../layouts/BaseLayout";
 import Panel from "../../components/Panel";
-import EngineCoreVisualizer from "../../components/EngineCoreVisualizer";
+import dynamic from "next/dynamic";
 import { api } from "../../services/api";
+
+const EngineCoreVisualizer = dynamic(() => import("../../components/EngineCoreVisualizer"), {
+  ssr: false,
+  loading: () => (
+    <div className="w-full h-[320px] flex items-center justify-center bg-black/40 border border-primary/20 rounded font-mono text-[10px] text-gray-500 uppercase tracking-widest animate-pulse">
+      Initializing reactor core display...
+    </div>
+  ),
+});
 import { engineAudio } from "../../services/engineAudio";
 
 // Extended TypeScript types to support the rich telemetry model

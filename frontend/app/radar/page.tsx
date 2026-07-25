@@ -3,8 +3,18 @@
 import React, { useState, useEffect, useRef } from "react";
 import BaseLayout from "../../layouts/BaseLayout";
 import Panel from "../../components/Panel";
-import RadarDisplay, { RadarTarget } from "../../components/RadarDisplay";
+import dynamic from "next/dynamic";
+import type { RadarTarget } from "../../components/RadarDisplay";
 import { api } from "../../services/api";
+
+const RadarDisplay = dynamic(() => import("../../components/RadarDisplay"), {
+  ssr: false,
+  loading: () => (
+    <div className="w-full h-[400px] flex items-center justify-center bg-black/40 border border-primary/20 rounded font-mono text-[10px] text-gray-500 uppercase tracking-widest animate-pulse">
+      Initializing radar sweep...
+    </div>
+  ),
+});
 
 interface ApiResponseEnvelope<T> {
   success: boolean;
