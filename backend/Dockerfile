@@ -32,13 +32,15 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 COPY --from=builder /opt/venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
 ENV PYTHONUNBUFFERED=1
+ENV PYTHONPATH=/app
 
-# Copy application source code
-COPY . .
+# Copy application source code into the backend subfolder
+COPY . ./backend
 
 # Expose container application port
 EXPOSE 8000
 
 # Fix execution permissions on entrypoint script and run it
-RUN chmod +x entrypoint.sh
+RUN chmod +x ./backend/entrypoint.sh
+WORKDIR /app/backend
 ENTRYPOINT ["./entrypoint.sh"]
