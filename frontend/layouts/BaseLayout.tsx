@@ -217,6 +217,12 @@ export function BaseLayout({ children }: BaseLayoutProps) {
           <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 12h3.812l2.363-4.727a.75.75 0 011.368.097l2.42 7.26 2.317-5.792a.75.75 0 011.373-.03L18 12h3.75" />
         </svg>
       );
+    case "ai":
+      return (
+        <svg {...iconProps}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m0-12.728l.707.707m11.314 11.314l.707.707M12 8a4 4 0 100 8 4 4 0 000-8z" />
+        </svg>
+      );
     case "cog":
         return (
           <svg {...iconProps}>

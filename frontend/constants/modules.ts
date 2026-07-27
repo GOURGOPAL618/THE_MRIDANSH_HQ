@@ -120,4 +120,12 @@ export const MODULES: ModuleItem[] = [
     description: "Detailed system readiness, database latencies, and storage monitoring.",
     clearanceLevel: "commander",
   },
+  {
+    id: "ai",
+    name: "AI Command Center",
+    path: "/ai",
+    iconName: "ai",
+    description: "Intelligent cockpit assistant to analyze logs, code, datasets, and research.",
+    clearanceLevel: "commander",
+  },
 ];
