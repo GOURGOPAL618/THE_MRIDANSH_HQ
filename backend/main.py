@@ -26,10 +26,10 @@ app = FastAPI(
 # Register request lifecycle middlewares
 app.add_middleware(GZipMiddleware, minimum_size=512)
 app.add_middleware(TelemetryMiddleware)
-app.add_middleware(RequestIDMiddleware)
-app.add_middleware(SecurityHeadersMiddleware)
-app.add_middleware(CacheControlMiddleware)
 app.add_middleware(RateLimitMiddleware)
+app.add_middleware(RequestIDMiddleware)
+app.add_middleware(CacheControlMiddleware)
+app.add_middleware(SecurityHeadersMiddleware)
 
 # CORS configuration to support localhost, Vercel, and custom domains (registered last to execute first in ASGI pipeline)
 if settings.BACKEND_CORS_ORIGINS:

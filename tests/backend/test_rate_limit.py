@@ -56,6 +56,15 @@ class TestRateLimiterAndMiddleware(BaseBackendTest):
         headers_resp = ctx.exception.headers
         self.assertIn("Retry-After", headers_resp)
         self.assertTrue(int(headers_resp["Retry-After"]) > 0)
+        
+        # Verify outer headers are preserved on 429 response
+        self.assertIn("X-Frame-Options", headers_resp)
+        self.assertEqual(headers_resp["X-Frame-Options"], "DENY")
+        self.assertIn("X-Content-Type-Options", headers_resp)
+        self.assertEqual(headers_resp["X-Content-Type-Options"], "nosniff")
+        self.assertIn("Content-Security-Policy", headers_resp)
+        self.assertIn("Cache-Control", headers_resp)
+        self.assertIn("X-Request-ID", headers_resp)
 
     def test_ai_query_throttled_independently(self):
         # 2. POST /api/v1/ai/query is throttled independently (10 limit)

@@ -7,29 +7,43 @@ import { Panel } from "@/components/Panel";
 import { Button } from "@/components/Button";
 
 interface ResearchPaper {
-  id: number;
+  id: string;
   title: string;
-  abstract: string;
+  category: string;
+  description: string;
 }
 
 interface DatasetItem {
-  id: number;
-  name: string;
+  id: string;
+  dataset_name: string;
+  category: string;
+  source: string;
   description: string;
-  row_count: number;
+  location: string;
 }
 
 interface LogItem {
-  id: number;
+  id: string;
   severity: string;
   module: string;
   description: string;
 }
 
 interface ExperimentItem {
-  id: number;
-  name: string;
-  script_content: string;
+  id: string;
+  title: string;
+  objective: string;
+  status: string;
+  notes?: {
+    category?: string;
+    target_thrust?: number;
+    nozzle_yaw?: number;
+    nozzle_pitch?: number;
+    duration_seconds?: number;
+    dataset_id?: string;
+    research_id?: string;
+    observations?: string;
+  };
 }
 
 interface ChatMessage {
@@ -64,7 +78,7 @@ export default function AICockpitPage() {
   useEffect(() => {
     const loadContextData = async () => {
       try {
-        const researchRes = await api.get<{ data: ResearchPaper[] }>("/api/v1/research/papers");
+        const researchRes = await api.get<{ data: ResearchPaper[] }>("/api/v1/research");
         if (researchRes.data?.data) setResearchList(researchRes.data.data);
         
         const datasetsRes = await api.get<{ data: DatasetItem[] }>("/api/v1/datasets");
@@ -90,11 +104,11 @@ export default function AICockpitPage() {
   const assembleContextPayload = (): string => {
     if (mode === "research" && selectedResearchId) {
       const paper = researchList.find(p => p.id.toString() === selectedResearchId);
-      if (paper) return `RESEARCH PAPER TITLE: ${paper.title}\nABSTRACT:\n${paper.abstract}`;
+      if (paper) return `RESEARCH PAPER TITLE: ${paper.title}\nCATEGORY: ${paper.category}\nDESCRIPTION:\n${paper.description}`;
     }
     if (mode === "dataset" && selectedDatasetId) {
       const ds = datasetList.find(d => d.id.toString() === selectedDatasetId);
-      if (ds) return `DATASET NAME: ${ds.name}\nDESCRIPTION: ${ds.description}\nROW COUNT: ${ds.row_count}`;
+      if (ds) return `DATASET NAME: ${ds.dataset_name}\nCATEGORY: ${ds.category}\nSOURCE: ${ds.source}\nLOCATION: ${ds.location}\nDESCRIPTION: ${ds.description}`;
     }
     if (mode === "logs" && selectedLogId) {
       const log = logsList.find(l => l.id.toString() === selectedLogId);
@@ -102,7 +116,10 @@ export default function AICockpitPage() {
     }
     if (mode === "experiment" && selectedExperimentId) {
       const exp = experimentsList.find(e => e.id.toString() === selectedExperimentId);
-      if (exp) return `EXPERIMENT NAME: ${exp.name}\nSCRIPT CODE:\n${exp.script_content}`;
+      if (exp) {
+        const notesStr = exp.notes ? JSON.stringify(exp.notes, null, 2) : "N/A";
+        return `EXPERIMENT TITLE: ${exp.title}\nOBJECTIVE: ${exp.objective}\nSTATUS: ${exp.status}\nMETADATA/NOTES:\n${notesStr}`;
+      }
     }
     return "";
   };
@@ -267,7 +284,7 @@ export default function AICockpitPage() {
                 >
                   <option value="">-- No Context --</option>
                   {datasetList.map(d => (
-                    <option key={d.id} value={d.id.toString()}>{d.name} ({d.row_count} rows)</option>
+                    <option key={d.id} value={d.id.toString()}>{d.dataset_name} ({d.category})</option>
                   ))}
                 </select>
               </div>
@@ -301,7 +318,7 @@ export default function AICockpitPage() {
                 >
                   <option value="">-- No Context --</option>
                   {experimentsList.map(e => (
-                    <option key={e.id} value={e.id.toString()}>{e.name}</option>
+                    <option key={e.id} value={e.id.toString()}>{e.title} ({e.status})</option>
                   ))}
                 </select>
               </div>
