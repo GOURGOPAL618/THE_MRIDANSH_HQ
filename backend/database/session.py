@@ -3,6 +3,9 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import declarative_base, sessionmaker
 from backend.core.config import settings
 
+from sqlalchemy.engine import Engine
+from sqlalchemy import event
+
 # Create database engine
 connect_args = {}
 if settings.DATABASE_URL.startswith("sqlite"):
@@ -14,6 +17,19 @@ engine = create_engine(
     pool_recycle=3600,
     connect_args=connect_args,
 )
+
+@event.listens_for(Engine, "connect")
+def set_sqlite_pragma(dbapi_connection, connection_record):
+    # Only run SQLite pragmas if the active dialect is SQLite
+    if dbapi_connection.__class__.__module__ == "sqlite3":
+        cursor = dbapi_connection.cursor()
+        try:
+            cursor.execute("PRAGMA journal_mode=WAL")
+            cursor.execute("PRAGMA synchronous=NORMAL")
+        except Exception:
+            pass
+        finally:
+            cursor.close()
 
 # Sessionmaker factory
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)

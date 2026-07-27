@@ -63,7 +63,7 @@ class TestAIEndpoints(BaseBackendTest):
         )
         self.assertEqual(response.status, 200)
         self.assertEqual(response.headers.get("Content-Type"), "text/event-stream")
-        self.assertEqual(response.headers.get("Cache-Control"), "no-cache")
+        self.assertEqual(response.headers.get("Cache-Control"), "no-cache, no-store, must-revalidate")
 
     def test_stream_endpoint_payload_formatting(self):
         # 7. Streamed chunks have valid SSE formatting and emit [DONE] marker

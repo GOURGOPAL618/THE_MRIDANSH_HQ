@@ -22,7 +22,7 @@ interface RadarDisplayProps {
   sweepSpeed: number; // degrees per frame
 }
 
-export default function RadarDisplay({
+function RadarDisplay({
   targets,
   selectedTargetId,
   onSelectTarget,
@@ -336,3 +336,13 @@ export default function RadarDisplay({
     </div>
   );
 }
+
+export default React.memo(RadarDisplay, (prev, next) => {
+  return (
+    prev.selectedTargetId === next.selectedTargetId &&
+    prev.showNoise === next.showNoise &&
+    prev.maxRange === next.maxRange &&
+    prev.sweepSpeed === next.sweepSpeed &&
+    prev.targets === next.targets
+  );
+});

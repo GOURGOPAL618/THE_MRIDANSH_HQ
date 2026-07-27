@@ -6,7 +6,7 @@ interface EngineCoreVisualizerProps {
   engineState: "shutdown" | "igniting" | "nominal" | "emergency_stop";
 }
 
-export default function EngineCoreVisualizer({ engineState }: EngineCoreVisualizerProps) {
+function EngineCoreVisualizer({ engineState }: EngineCoreVisualizerProps) {
   const feTurbulenceRef = useRef<SVGFETurbulenceElement | null>(null);
   const animationRef = useRef<number | null>(null);
   const [pulseScale, setPulseScale] = useState(1);
@@ -192,3 +192,5 @@ export default function EngineCoreVisualizer({ engineState }: EngineCoreVisualiz
     </div>
   );
 }
+
+export default React.memo(EngineCoreVisualizer);

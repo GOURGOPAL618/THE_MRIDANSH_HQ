@@ -265,4 +265,4 @@ const EarthGlobe = forwardRef<EarthGlobeRef, EarthGlobeProps>(
 
 EarthGlobe.displayName = "EarthGlobe";
 
-export default EarthGlobe;
+export default React.memo(EarthGlobe);

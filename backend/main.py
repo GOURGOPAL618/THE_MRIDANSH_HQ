@@ -11,6 +11,7 @@ from backend.core.logging_config import system_logger, security_logger, request_
 from backend.middleware.request_id import RequestIDMiddleware
 from backend.middleware.telemetry import TelemetryMiddleware
 from backend.middleware.security import SecurityHeadersMiddleware
+from backend.middleware.cache import CacheControlMiddleware
 from backend.schemas.responses import ApiResponse, make_response
 from backend.api.v1.router import api_router
 
@@ -26,6 +27,7 @@ app.add_middleware(GZipMiddleware, minimum_size=512)
 app.add_middleware(TelemetryMiddleware)
 app.add_middleware(RequestIDMiddleware)
 app.add_middleware(SecurityHeadersMiddleware)
+app.add_middleware(CacheControlMiddleware)
 
 # CORS configuration to support localhost, Vercel, and custom domains (registered last to execute first in ASGI pipeline)
 if settings.BACKEND_CORS_ORIGINS:
