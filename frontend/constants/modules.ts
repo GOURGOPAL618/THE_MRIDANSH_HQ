@@ -112,4 +112,12 @@ export const MODULES: ModuleItem[] = [
     description: "External API connections control room and JCC integrations diagnostics.",
     clearanceLevel: "commander",
   },
+  {
+    id: "diagnostics",
+    name: "System Observability",
+    path: "/diagnostics",
+    iconName: "diagnostics",
+    description: "Detailed system readiness, database latencies, and storage monitoring.",
+    clearanceLevel: "commander",
+  },
 ];
