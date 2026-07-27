@@ -39,6 +39,7 @@ class Settings(BaseSettings):
     GITHUB_OWNER: str = "GOURGOPAL618"
     GITHUB_REPO: str = "THE_MRIDANSH_HQ"
     GLOBAL_MOCK_MODE: bool = True  # Bypass outbound networks by default in development
+    TRUSTED_PROXIES: List[str] = []  # Explicitly configured trusted reverse proxies list
 
     # App environment config to read .env
     model_config = SettingsConfigDict(

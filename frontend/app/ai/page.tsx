@@ -153,6 +153,15 @@ export default function AICockpitPage() {
       });
 
       if (!response.ok) {
+        if (response.status === 429) {
+          try {
+            const errData = await response.json();
+            notifyError(errData?.message || "Too many requests. Operation throttled.", "Rate Limit Exceeded");
+          } catch {
+            notifyError("Too many requests. Operation throttled.", "Rate Limit Exceeded");
+          }
+          return;
+        }
         throw new Error("API streaming error response received.");
       }
 

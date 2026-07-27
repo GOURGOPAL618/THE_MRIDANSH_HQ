@@ -49,6 +49,25 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
     [removeNotification]
   );
 
+  React.useEffect(() => {
+    const handleGlobalNotification = (e: Event) => {
+      const customEvent = e as CustomEvent<{
+        type: NotificationType;
+        message: string;
+        title?: string;
+        duration?: number;
+      }>;
+      if (customEvent.detail) {
+        const { type, message, title, duration } = customEvent.detail;
+        showNotification(type, message, title, duration);
+      }
+    };
+    window.addEventListener("app-notification", handleGlobalNotification);
+    return () => {
+      window.removeEventListener("app-notification", handleGlobalNotification);
+    };
+  }, [showNotification]);
+
   return (
     <NotificationContext.Provider
       value={{ notifications, showNotification, removeNotification }}

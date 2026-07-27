@@ -44,6 +44,15 @@ class ApiService {
       if (!response.ok) {
         // Parse error message from FastAPI response formats
         error = data?.detail || data?.message || response.statusText || "Request failed";
+        if (statusCode === 429 && typeof window !== "undefined") {
+          window.dispatchEvent(new CustomEvent("app-notification", {
+            detail: {
+              type: "error",
+              message: error,
+              title: "Rate Limit Exceeded"
+            }
+          }));
+        }
         return { error, statusCode };
       }
 
