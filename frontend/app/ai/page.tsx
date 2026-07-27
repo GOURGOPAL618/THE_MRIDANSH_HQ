@@ -134,12 +134,17 @@ export default function AICockpitPage() {
 
     try {
       const token = localStorage.getItem("jcc_auth_token");
+      const headers: Record<string, string> = {
+        "Content-Type": "application/json",
+      };
+      if (token && token !== "null" && token !== "undefined" && token.trim() !== "") {
+        headers["Authorization"] = `Bearer ${token}`;
+      }
+
       const response = await fetch(`${apiUrl}/api/v1/ai/stream`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`
-        },
+        credentials: "include",
+        headers,
         body: JSON.stringify({
           prompt: userMessage,
           mode: mode,
