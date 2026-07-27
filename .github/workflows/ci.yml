@@ -1,0 +1,61 @@
+name: JCC Command Cockpit CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test-backend:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r backend/requirements.txt
+
+      - name: Run backend automated test suite
+        env:
+          DATABASE_URL: sqlite:///./test_mridansh.db
+          JWT_SECRET: ci_secret_key_jcc_telemetry_jwt_access
+          SESSION_SECRET: ci_secret_key_jcc_telemetry_session_access
+          COMMANDER_USERNAME: commander
+          COMMANDER_PASSWORD: @mridansh1607x
+          GLOBAL_MOCK_MODE: "true"
+        run: |
+          python tests/run_backend_tests.py
+
+  test-frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install npm dependencies
+        working-directory: frontend
+        run: npm ci
+
+      - name: Run frontend unit tests
+        working-directory: frontend
+        run: npm run test
+
+      - name: Verify production build
+        working-directory: frontend
+        run: npm run build

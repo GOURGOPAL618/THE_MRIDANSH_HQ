@@ -1,6 +1,7 @@
 from fastapi import FastAPI, status, Request
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
+from starlette.middleware.gzip import GZipMiddleware
 from fastapi.exceptions import RequestValidationError
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
@@ -9,6 +10,7 @@ from backend.core.config import settings
 from backend.core.logging_config import system_logger, security_logger, request_id_var
 from backend.middleware.request_id import RequestIDMiddleware
 from backend.middleware.telemetry import TelemetryMiddleware
+from backend.middleware.security import SecurityHeadersMiddleware
 from backend.schemas.responses import ApiResponse, make_response
 from backend.api.v1.router import api_router
 
@@ -20,8 +22,10 @@ app = FastAPI(
 )
 
 # Register request lifecycle middlewares
+app.add_middleware(GZipMiddleware, minimum_size=512)
 app.add_middleware(TelemetryMiddleware)
 app.add_middleware(RequestIDMiddleware)
+app.add_middleware(SecurityHeadersMiddleware)
 
 # CORS configuration to support localhost, Vercel, and custom domains (registered last to execute first in ASGI pipeline)
 if settings.BACKEND_CORS_ORIGINS:
