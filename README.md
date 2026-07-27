@@ -91,10 +91,10 @@ STATUS:            🟢 ALL SYSTEMS NOMINAL — v1.0.0-rc1
 │                  JAGANNATH COMMAND CENTER                    │
 │                       THE MRIDANSH HQ                        │
 ├──────────────────────────────────────────────────────────────┤
-│                          FRONTEND                             │
+│                          FRONTEND                            │
 │            Next.js • React • TypeScript • Tailwind           │
 ├──────────────────────────────────────────────────────────────┤
-│                   API & APPLICATION LAYER                     │
+│                   API & APPLICATION LAYER                    │
 │                        FastAPI • ASGI                        │
 ├──────────────────────────────────────────────────────────────┤
 │                    SERVICE ARCHITECTURE                       │
