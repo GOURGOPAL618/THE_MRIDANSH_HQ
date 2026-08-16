@@ -97,14 +97,14 @@ STATUS:            🟢 ALL SYSTEMS NOMINAL — v1.0.0-rc1
 │                   API & APPLICATION LAYER                    │
 │                        FastAPI • ASGI                        │
 ├──────────────────────────────────────────────────────────────┤
-│                    SERVICE ARCHITECTURE                       │
+│                    SERVICE ARCHITECTURE                      │
 │   AI • Search • Logging • Integrations • Health • Security   │
 ├──────────────────────────────────────────────────────────────┤
-│                        DATA LAYER                             │
-│              SQLAlchemy • SQLite • PostgreSQL                 │
+│                        DATA LAYER                            │
+│              SQLAlchemy • SQLite • PostgreSQL                │
 ├──────────────────────────────────────────────────────────────┤
-│                   EXTERNAL INTELLIGENCE                       │
-│       NASA • Weather • AI Providers • GitHub • Maps           │
+│                   EXTERNAL INTELLIGENCE                      │
+│       NASA • Weather • AI Providers • GitHub • Maps          │
 └──────────────────────────────────────────────────────────────┘
 ```
 
