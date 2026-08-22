@@ -7,6 +7,7 @@ This project adheres to [Semantic Versioning](https://semver.org/) and follows t
 
 ---
 
+
 ## [v1.0.0-rc1] — Release Candidate
 
 ### 🟢 Status
