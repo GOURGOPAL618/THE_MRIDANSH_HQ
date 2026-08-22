@@ -14,6 +14,7 @@ Thank you for your interest in contributing to **THE MRIDANSH HQ — Jagannath C
 
 ---
 
+
 ## 🏛️ Project Architecture Principles
 
 All contributions must respect the existing architecture:
